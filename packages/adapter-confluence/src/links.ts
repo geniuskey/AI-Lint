@@ -1,5 +1,5 @@
 import type { Block, Link } from '@ai-lint/ir'
-import { childOf, findDescendants, textOf } from './dom.js'
+import { childOf, findDescendants, textOf } from '@ai-lint/xml'
 
 export interface LinkContext {
   baseUrl: string

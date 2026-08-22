@@ -85,6 +85,9 @@ importers:
       '@ai-lint/ir':
         specifier: workspace:*
         version: link:../ir
+      '@ai-lint/xml':
+        specifier: workspace:*
+        version: link:../xml
     devDependencies:
       happy-dom:
         specifier: ^15.11.0
@@ -134,6 +137,12 @@ importers:
       zod:
         specifier: ^3.24.0
         version: 3.25.76
+
+  packages/xml:
+    devDependencies:
+      happy-dom:
+        specifier: ^15.11.0
+        version: 15.11.7
 
 packages:
 
