@@ -1,3 +1,4 @@
+import type { FileContext } from '@ai-lint/ir'
 import { attr, findDescendant, findDescendants, parseFragment, textOf } from '@ai-lint/xml'
 import { strFromU8, unzipSync } from 'fflate'
 
@@ -98,5 +99,16 @@ export function coreProperties(pkg: Package): CoreProperties {
     ...(title === undefined ? {} : { title }),
     ...(creator === undefined ? {} : { creator }),
     ...(modified === undefined ? {} : { modified }),
+  }
+}
+
+/** 호출자가 준 값이 우선이다. 파일 시스템 쪽이 문서 속성보다 최신인 경우가 많다. */
+export function mergeContext(ctx: FileContext, core: CoreProperties): FileContext {
+  const modifiedAt = ctx.modifiedAt ?? core.modified
+  const author = ctx.author ?? core.creator
+  return {
+    uri: ctx.uri,
+    ...(modifiedAt === undefined ? {} : { modifiedAt }),
+    ...(author === undefined ? {} : { author }),
   }
 }

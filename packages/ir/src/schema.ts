@@ -77,14 +77,7 @@ export const BlockSchema = z.discriminatedUnion('kind', [
   withBase({
     kind: z.literal('slide'),
     index: z.number().int().positive(),
-    title: z.string().optional(),
     notes: z.string().optional(),
-  }),
-  withBase({
-    kind: z.literal('sheet'),
-    name: z.string(),
-    headers: z.array(z.string()),
-    usedRange: z.string(),
   }),
 ])
 export type Block = z.infer<typeof BlockSchema>

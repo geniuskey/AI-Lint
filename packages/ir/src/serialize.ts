@@ -43,12 +43,9 @@ function renderBlock(block: Block): string {
       return block.renderedText ?? `[매크로: ${block.name} — 내용 추출 불가]`
 
     case 'slide': {
-      const head = `## 슬라이드 ${block.index}${block.title ? `: ${block.title}` : ''}`
+      const head = `## 슬라이드 ${block.index}`
       return block.notes ? `${head}\n발표자 노트: ${block.notes}` : head
     }
-
-    case 'sheet':
-      return `## 시트 ${block.name} (${block.usedRange})\n열: ${block.headers.join(', ')}`
   }
 }
 
