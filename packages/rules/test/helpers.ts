@@ -16,7 +16,16 @@ export const heading = (id: string, level: 1 | 2 | 3 | 4 | 5 | 6, text: string):
   text,
 })
 
-export const para = (id: string, text: string): Block => ({ ...base(id, text), kind: 'paragraph', text })
+export const para = (
+  id: string,
+  text: string,
+  opts: { emphasizedAsHeading?: boolean } = {},
+): Block => ({
+  ...base(id, text),
+  kind: 'paragraph',
+  text,
+  ...(opts.emphasizedAsHeading ? { emphasizedAsHeading: true } : {}),
+})
 
 export const list = (
   id: string,

@@ -268,8 +268,24 @@ describe('구조 룰 전반', () => {
   it('모든 구조 룰이 등록되어 있다', () => {
     expect(STRUCTURE_RULES.map((r) => r.id)).toEqual([
       'STR001', 'STR002', 'STR003', 'STR004', 'STR005', 'STR006',
-      'STR007', 'STR008', 'STR009', 'STR010', 'STR011', 'STR012',
+      'STR007', 'STR008', 'STR009', 'STR010', 'STR011', 'STR012', 'STR013',
     ])
     expect(STRUCTURE_RULES.every((r) => r.axis === 'structure')).toBe(true)
+  })
+})
+
+describe('STR013 emphasis-as-heading', () => {
+  it('굵고 크게 흉내낸 제목이면 위반', () => {
+    const doc = makeDoc([para('a', '사전 준비물', { emphasizedAsHeading: true })])
+    expect(fire(doc)).toContain('STR013')
+  })
+
+  it('평범한 문단은 정상', () => {
+    expect(fire(makeDoc([para('a', '먼저 설치 파일을 내려받습니다.')]))).not.toContain('STR013')
+  })
+
+  it('해당 문단을 지목한다', () => {
+    const doc = makeDoc([para('a', '본문'), para('b', '사전 준비물', { emphasizedAsHeading: true })])
+    expect(findingsFor(doc, 'STR013')[0]?.blockId).toBe('b')
   })
 })

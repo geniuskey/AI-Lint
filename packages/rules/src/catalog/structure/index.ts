@@ -11,6 +11,7 @@ import { str009 } from './str009-table-no-header.js'
 import { str010 } from './str010-deep-nesting.js'
 import { str011 } from './str011-attachment-only.js'
 import { str012 } from './str012-unrendered-macro.js'
+import { str013 } from './str013-emphasis-as-heading.js'
 
 export const STRUCTURE_RULES: Rule[] = [
   str001,
@@ -25,6 +26,7 @@ export const STRUCTURE_RULES: Rule[] = [
   str010,
   str011,
   str012,
+  str013,
 ]
 
 export { isMeaningfulAlt } from './str005-image-missing-alt.js'
