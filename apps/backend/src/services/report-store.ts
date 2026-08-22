@@ -1,6 +1,6 @@
+import type { LintReport } from '@ai-lint/contract'
 import type { DocType } from '@ai-lint/ir'
 import type { Pool } from '../db/client.js'
-import type { LintReport } from './lint-service.js'
 
 export interface CacheKey {
   documentHash: string

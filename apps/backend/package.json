@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ai-lint/contract": "workspace:*",
     "@ai-lint/ir": "workspace:*",
     "@ai-lint/llm": "workspace:*",
     "@ai-lint/rules": "workspace:*",

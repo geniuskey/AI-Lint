@@ -1,7 +1,7 @@
+import type { LintReport } from '@ai-lint/contract'
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 import { createPool, type Pool } from '../src/db/client.js'
 import { migrate } from '../src/db/migrate.js'
-import type { LintReport } from '../src/services/lint-service.js'
 import { createMemoryStore, createPgStore, type CacheKey, type ReportStore } from '../src/services/report-store.js'
 
 let seq = 0

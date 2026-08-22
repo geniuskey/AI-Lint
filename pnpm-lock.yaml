@@ -26,6 +26,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@ai-lint/contract':
+        specifier: workspace:*
+        version: link:../../packages/contract
       '@ai-lint/ir':
         specifier: workspace:*
         version: link:../../packages/ir
@@ -51,6 +54,18 @@ importers:
       tsup:
         specifier: ^8.3.0
         version: 8.5.1(postcss@8.5.26)(tsx@4.23.12)(typescript@5.9.3)(yaml@2.9.0)
+
+  packages/contract:
+    dependencies:
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
+      '@ai-lint/rules':
+        specifier: workspace:*
+        version: link:../rules
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
 
   packages/ir:
     dependencies:
