@@ -7,3 +7,7 @@ input, select { padding: 6px 8px; border: 1px solid #c7cbd1; border-radius: 4px;
 .actions { display: flex; gap: 8px; margin-bottom: 16px; }
 button { padding: 6px 14px; border: 1px solid #c7cbd1; border-radius: 4px; background: #fff; font: inherit; cursor: pointer; }
 button:hover { background: #eef1f5; }
+.inline { display: flex; align-items: center; gap: 4px; }
+.jobs { list-style: none; padding: 0; }
+.jobs li { display: grid; grid-template-columns: 1fr 80px 2fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e3e6ea; }
+.error { color: #b3261e; }

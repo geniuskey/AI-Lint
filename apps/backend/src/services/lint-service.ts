@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { LintOptions, LintReport, LlmSkipReason } from '@ai-lint/contract'
-import { hashDocument, totalTextLength, type DocType, type Document } from '@ai-lint/ir'
+import { totalTextLength, type DocType, type Document } from '@ai-lint/ir'
+import { hashDocument } from '@ai-lint/ir/hash'
 import { activeLlmRules, analyzeContext, inferDocType, type LlmProvider } from '@ai-lint/llm'
 import { runRules, scoreFindings, type Finding, type ResolvedRuleset, type RuleRegistry } from '@ai-lint/rules'
 import { HttpError } from '../errors.js'

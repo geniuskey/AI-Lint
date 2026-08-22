@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto'
 import type { Document } from './schema.js'
 
 /**
- * 캐시 키용 내용 해시.
+ * 캐시 키용 내용 해시. `node:crypto`를 쓰므로 배럴에 넣지 않는다 —
+ * 브라우저에서 도는 어댑터가 `@ai-lint/ir`만 가져와도 번들이 깨지지 않아야 한다.
  * 앵커와 source의 휘발성 필드는 제외한다 — 페이지 DOM 구조가 바뀌어도 내용이 같으면 캐시가 살아야 한다.
  */
 export function hashDocument(doc: Document): string {
