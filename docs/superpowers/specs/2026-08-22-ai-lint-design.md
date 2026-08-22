@@ -403,6 +403,9 @@ interface LintReport {
   findings: Finding[]
   stats: { rulesEvaluated: number; llmFindingsRejected: number; durationMs: number }
   llmStatus: 'ok' | 'partial' | 'skipped' | 'failed'
+  llmSkipReason?: 'disabled' | 'quota' | 'too-large'
+  truncated: boolean        // 블록 수 상한 초과로 잘라서 검사함
+  cached: boolean           // 동일 해시의 기존 리포트를 재사용함
   createdAt: string
 }
 
