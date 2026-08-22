@@ -747,8 +747,9 @@ function addMacro(walker: Walker, el: Element, listDepth: number): void {
     return
   }
 
-  const renderedText = textOf(rich ?? plain ?? el)
-  add(walker, el, { kind: 'macro', name, params, ...optional('renderedText', renderedText) })
+  // 본문 요소가 없으면 렌더 텍스트도 없다. el을 그대로 읽으면 파라미터 값이 본문으로 둔갑한다.
+  const body = rich ?? plain
+  add(walker, el, { kind: 'macro', name, params, ...optional('renderedText', body ? textOf(body) : null) })
 }
 
 function addImage(walker: Walker, el: Element): void {
