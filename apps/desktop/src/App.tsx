@@ -9,10 +9,8 @@ import {
 import {
   fileSystem, pickFiles, pickFolder, readDocument, settingsStore, tokenStore,
 } from './platform/tauri.js'
-
-const PHASE_LABELS: Record<JobState['phase'], string> = {
-  pending: '대기', parsing: '읽는 중', linting: '검사 중', done: '완료', failed: '실패',
-}
+import { JobTable } from './ui/JobTable.js'
+import { ReportView } from './ui/ReportView.js'
 
 function fileOfPath(path: string): DocumentFile | null {
   const name = path.split(/[\\/]/).pop() ?? path
@@ -27,6 +25,7 @@ export function App(): JSX.Element {
   const [jobs, setJobs] = useState<JobState[]>([])
   const [running, setRunning] = useState(false)
   const [useLlm, setUseLlm] = useState(true)
+  const [selected, setSelected] = useState(0)
   const cancelRef = useRef(false)
 
   useEffect(() => {
@@ -40,6 +39,7 @@ export function App(): JSX.Element {
     setFiles(found)
     setJobs(initialJobs(found))
     setUseLlm(defaultUseLlm(found.length))
+    setSelected(0)
   }
 
   const onPickFolder = async (): Promise<void> => {
@@ -115,15 +115,10 @@ export function App(): JSX.Element {
         ) : null}
       </section>
 
-      <ul className="jobs">
-        {jobs.map((job) => (
-          <li key={job.file.path}>
-            <span>{job.file.name}</span>
-            <span>{PHASE_LABELS[job.phase]}</span>
-            {job.error === null ? null : <span className="error">{job.error}</span>}
-          </li>
-        ))}
-      </ul>
+      <section className="split">
+        <JobTable jobs={jobs} selected={selected} onSelect={setSelected} />
+        <ReportView job={jobs[selected]} />
+      </section>
     </main>
   )
 }

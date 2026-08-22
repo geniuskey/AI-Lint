@@ -75,6 +75,9 @@ importers:
       '@ai-lint/labels':
         specifier: workspace:*
         version: link:../../packages/labels
+      '@ai-lint/rules':
+        specifier: workspace:*
+        version: link:../../packages/rules
       '@tauri-apps/api':
         specifier: ^2.1.1
         version: 2.11.1
