@@ -1,0 +1,24 @@
+{
+  "name": "@ai-lint/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-lint/ir": "workspace:*",
+    "@ai-lint/llm": "workspace:*",
+    "@ai-lint/rules": "workspace:*",
+    "fastify": "^5.2.0",
+    "pg": "^8.13.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "tsup": "^8.3.0"
+  }
+}
