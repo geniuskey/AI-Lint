@@ -37,9 +37,13 @@ packages/adapter-pdf/     pdf → Document IR
 
 ## 3. 파서 모드
 
-Confluence storage는 `ac:` · `ri:` 접두사가 선언되지 않아 `text/html`로 읽어야 했다. OOXML은 다르다. 슬라이드·문서·시트 XML 모두 루트에서 사용하는 네임스페이스를 전부 선언하므로 `application/xml`이 올바른 선택이다.
+Confluence storage는 `ac:` · `ri:` 접두사가 선언되지 않아 `text/html`로 읽어야 했다. OOXML은 네임스페이스를 전부 선언하므로 `application/xml`도 후보였으나, **`text/html`로 통일한다.**
 
-단 `happy-dom`의 XML 파싱이 네임스페이스 접두사에서 `localName`을 제대로 채우는지는 검증되지 않았다. **구현 첫 태스크에서 실제 픽스처로 확인하고, 실패하면 `text/html`로 내린다.** 어느 쪽이든 `localName` 기반 순회 헬퍼는 그대로 쓴다.
+실측 결과 `happy-dom`은 `application/xml`을 실제 XML로 파싱하지 않는다. 두 모드 모두 HTML 파서로 넘기고 `localName`에 접두사를 소문자로 남긴다 (`p:sld`). 반면 실제 브라우저의 `application/xml`은 `localName`이 `sld`, `prefix`가 `p`다. 이 차이를 그대로 두면 테스트가 통과해도 WebView2에서 어긋난다. `text/html`은 양쪽 모두 `p:sld`를 내므로 테스트와 런타임이 일치한다.
+
+OOXML을 HTML 파서로 읽어도 안전한 이유: DOCX·PPTX의 태그는 전부 접두사가 붙어(`w:tbl`, `a:p`) HTML의 특수 태그 처리에 걸리지 않는다. XLSX 시트 XML만 기본 네임스페이스라 접두사가 없으나(`worksheet`, `sheetData`, `row`, `c`, `v`) HTML 특수 태그와 이름이 겹치지 않는다.
+
+접두사는 고정 관례일 뿐이므로 순회 헬퍼는 접두사를 무시하고 지역명으로 맞춘다. Confluence처럼 접두사까지 봐야 하는 곳은 콜론을 포함한 질의로 정확히 맞춘다.
 
 ## 4. 공통 OOXML 기반
 
@@ -170,7 +174,7 @@ export function relationships(pkg: Package, partPath: string): Map<string, strin
 
 ## 10. 테스트 전략
 
-- **어댑터** — 포맷마다 실제 파일 픽스처를 만들어 IR 스냅샷을 잡는다. 픽스처는 코드로 생성하지 않고 실제 Office/PDF 산출물을 커밋한다. 관건으로 지목한 것(그룹 도형, 가짜 제목, 병합 헤더, 스캔 PDF)은 각각 전용 픽스처를 둔다
+- **어댑터** — 포맷마다 실제 파일 픽스처를 만들어 IR 스냅샷을 잡는다. 픽스처는 XML을 손으로 지어내지 않고 로컬에 설치된 Office를 COM으로 구동해 실제 산출물을 만든 뒤 커밋한다. 생성 스크립트도 `test/fixtures/make/`에 함께 두어 재생성 경로를 남긴다. PDF는 Word의 `ExportAsFixedFormat`으로 뽑고, 스캔 PDF는 텍스트 없이 이미지만 넣은 문서로 만든다. 관건으로 지목한 것(그룹 도형, 가짜 제목, 병합 헤더, 스캔 PDF)은 각각 전용 픽스처를 둔다
 - **규칙** — `STR013` · `STR014`에 위반·정상 IR 픽스처 쌍
 - **큐** — 동시성 제한, 부분 실패 시 큐 지속, LLM 토글 반영을 백엔드 목으로 검증
 - **UI** — React Testing Library로 결과 표와 상세 렌더
