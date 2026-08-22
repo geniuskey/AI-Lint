@@ -3231,7 +3231,14 @@ export function mountPanel(container: HTMLElement, handlers: PanelHandlers): Pan
   const body = need(root, '.body')
   const doctype = need<HTMLSelectElement>(root, '.doctype')
 
-  doctype.replaceChildren(...DOC_TYPES.map((value) => new Option(DOC_TYPE_LABELS[value], value)))
+  doctype.replaceChildren(
+    ...DOC_TYPES.map((value) => {
+      const option = document.createElement('option')
+      option.value = value
+      option.textContent = DOC_TYPE_LABELS[value]
+      return option
+    }),
+  )
   doctype.addEventListener('change', () => handlers.onDocTypeChange(doctype.value as DocType))
 
   const open = (): void => aside.classList.add('open')
