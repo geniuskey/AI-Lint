@@ -7,7 +7,8 @@ export interface Extracted {
   elements: Element[]
 }
 
-type BlockBody = Omit<Block, 'id' | 'path' | 'anchor'>
+/** Omit을 그냥 쓰면 판별 유니온이 공통 필드만 남기고 뭉개진다. 각 갈래에 따로 적용한다. */
+type BlockBody = Block extends infer B ? (B extends Block ? Omit<B, 'id' | 'path' | 'anchor'> : never) : never
 
 /** 앵커는 앞뒤 블록 텍스트가 있어야 만들 수 있어서 두 번째 패스에서 채운다. */
 const PLACEHOLDER: SourceAnchor = { kind: 'confluence', xpath: '', textQuote: { exact: '?' } }

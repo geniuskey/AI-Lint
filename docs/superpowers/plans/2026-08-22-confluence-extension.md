@@ -572,7 +572,8 @@ export interface Extracted {
   elements: Element[]
 }
 
-type BlockBody = Omit<Block, 'id' | 'path' | 'anchor'>
+/** Omit을 그냥 쓰면 판별 유니온이 공통 필드만 남기고 뭉개진다. 각 갈래에 따로 적용한다. */
+type BlockBody = Block extends infer B ? (B extends Block ? Omit<B, 'id' | 'path' | 'anchor'> : never) : never
 
 /** 앵커는 앞뒤 블록 텍스트가 있어야 만들 수 있어서 두 번째 패스에서 채운다. */
 const PLACEHOLDER: SourceAnchor = { kind: 'confluence', xpath: '', textQuote: { exact: '?' } }
@@ -669,9 +670,24 @@ function addHeading(walker: Walker, el: Element, level: 1 | 2 | 3 | 4 | 5 | 6): 
   add(walker, el, { kind: 'heading', level, text: textOf(el) })
 }
 
+/**
+ * 본문이 없는 ac:link를 Confluence는 대상 제목으로 렌더한다.
+ * storage의 textContent만 보면 그런 문단이 통째로 사라진다.
+ */
+function linkLabelsOf(el: Element): string {
+  return findDescendants(el, 'ac:link')
+    .map((link) => {
+      const page = childOf(link, 'ri:page')
+      const attachment = childOf(link, 'ri:attachment')
+      return page?.getAttribute('ri:content-title') ?? attachment?.getAttribute('ri:filename') ?? ''
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
 function addParagraph(walker: Walker, el: Element): void {
   const images = findDescendants(el, 'ac:image')
-  const text = textOf(el)
+  const text = textOf(el) || linkLabelsOf(el)
   if (text) add(walker, el, { kind: 'paragraph', text })
   for (const image of images) addImage(walker, image)
 }
