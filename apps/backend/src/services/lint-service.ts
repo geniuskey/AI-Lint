@@ -1,53 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { DocumentSchema, hashDocument, totalTextLength, type DocType, type Document } from '@ai-lint/ir'
+import type { LintOptions, LintReport, LlmSkipReason } from '@ai-lint/contract'
+import { hashDocument, totalTextLength, type DocType, type Document } from '@ai-lint/ir'
 import { activeLlmRules, analyzeContext, inferDocType, type LlmProvider } from '@ai-lint/llm'
-import { runRules, scoreFindings, type Finding, type ResolvedRuleset, type RuleRegistry, type Score } from '@ai-lint/rules'
-import { z } from 'zod'
+import { runRules, scoreFindings, type Finding, type ResolvedRuleset, type RuleRegistry } from '@ai-lint/rules'
 import { HttpError } from '../errors.js'
 import type { QuotaService } from './quota.js'
 import type { CacheKey, ReportStore } from './report-store.js'
 import type { RulesetSource } from './ruleset-source.js'
-
-export const LintOptionsSchema = z
-  .object({
-    useLlm: z.boolean().default(true),
-    rulesetId: z.string().min(1).default('default'),
-    save: z.boolean().default(true),
-  })
-  .default({})
-
-export type LintOptions = z.infer<typeof LintOptionsSchema>
-
-export const LintRequestSchema = z.object({
-  document: DocumentSchema,
-  options: LintOptionsSchema,
-})
-
-export type LintRequest = z.infer<typeof LintRequestSchema>
-
-export type LlmStatus = 'ok' | 'partial' | 'skipped' | 'failed'
-export type LlmSkipReason = 'disabled' | 'quota' | 'too-large'
-
-export interface LintReport {
-  reportId: string
-  documentUri: string
-  documentHash: string
-  docType: DocType
-  rulesetId: string
-  rulesetVersion: number
-  score: Score
-  findings: Finding[]
-  stats: {
-    rulesEvaluated: number
-    llmFindingsRejected: number
-    durationMs: number
-  }
-  llmStatus: LlmStatus
-  llmSkipReason?: LlmSkipReason
-  truncated: boolean
-  cached: boolean
-  createdAt: string
-}
 
 export interface Limits {
   /** 이 수를 넘는 블록은 잘라낸다. 거대한 페이지 하나가 서버를 점유하는 것을 막는다. */

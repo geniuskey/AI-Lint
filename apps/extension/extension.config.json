@@ -1,0 +1,4 @@
+{
+  "confluenceOrigins": ["https://confluence.example.com/*"],
+  "backendOrigins": ["https://ai-lint.example.com/*"]
+}

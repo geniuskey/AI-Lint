@@ -1,5 +1,6 @@
+import { LintRequestSchema } from '@ai-lint/contract'
 import type { FastifyPluginAsync } from 'fastify'
-import { lintDocument, LintRequestSchema, type LintDeps } from '../services/lint-service.js'
+import { lintDocument, type LintDeps } from '../services/lint-service.js'
 
 export function lintRoutes(deps: LintDeps): FastifyPluginAsync {
   return async (app) => {

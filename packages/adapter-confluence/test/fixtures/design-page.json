@@ -1,0 +1,18 @@
+{
+  "id": "789",
+  "type": "page",
+  "title": "결제 모듈 개편 설계",
+  "space": { "key": "ENG" },
+  "version": { "number": 7, "when": "2026-07-15T02:00:00.000Z", "by": { "displayName": "김편집" } },
+  "history": { "createdBy": { "displayName": "박작성" } },
+  "metadata": {
+    "labels": { "results": [{ "name": "설계" }, { "name": "payment" }] },
+    "properties": {}
+  },
+  "ancestors": [{ "title": "엔지니어링" }, { "title": "결제" }],
+  "body": {
+    "storage": {
+      "value": "<h1>배경</h1><p>지난번 논의대로 3단계로 나눠서 진행하기로 했습니다.</p><ac:structured-macro ac:name=\"info\"><ac:rich-text-body><p>이 문서는 초안입니다</p></ac:rich-text-body></ac:structured-macro><h2>결정</h2><table><tbody><tr><th>단계</th><th>내용</th></tr><tr><td>1</td><td>승인 분리</td></tr></tbody></table><p>자세한 내용은 <a href=\"/display/ENG/Payment\">결제 홈</a> 참고</p><p><ac:image ac:alt=\"구성도\"><ri:attachment ri:filename=\"arch.png\"/></ac:image></p><ac:structured-macro ac:name=\"code\"><ac:parameter ac:name=\"language\">json</ac:parameter><ac:plain-text-body><![CDATA[{\"a\": 1}]]></ac:plain-text-body></ac:structured-macro>"
+    }
+  }
+}

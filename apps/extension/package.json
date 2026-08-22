@@ -1,0 +1,22 @@
+{
+  "name": "@ai-lint/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup && tsx scripts/build-assets.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:e2e": "pnpm build && playwright test"
+  },
+  "dependencies": {
+    "@ai-lint/adapter-confluence": "workspace:*",
+    "@ai-lint/contract": "workspace:*",
+    "@ai-lint/ir": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/chrome": "^0.0.287",
+    "happy-dom": "^15.11.0",
+    "tsup": "^8.3.0"
+  }
+}
