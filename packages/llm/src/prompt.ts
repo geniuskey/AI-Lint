@@ -2,6 +2,12 @@ import { outline, type DocType, type Document } from '@ai-lint/ir'
 import { LLM_RULE_IDS, RULE_META, type ResolvedRuleset } from '@ai-lint/rules'
 import type { Chunk } from './chunk.js'
 
+/**
+ * 프롬프트를 고치면 반드시 올린다.
+ * 리포트 캐시 키에 들어가므로, 올리지 않으면 낡은 프롬프트로 만든 결과가 계속 살아남는다.
+ */
+export const PROMPT_VERSION = 1
+
 const BASE_INSTRUCTIONS = `당신은 문서가 AI(RAG·LLM 에이전트)에게 읽힐 수 있는지 검사하는 린터입니다.
 사람이 회의 맥락을 공유한 상태에서만 이해되는 표현을 찾아내는 것이 목표입니다.
 

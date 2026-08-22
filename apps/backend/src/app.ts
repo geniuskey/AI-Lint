@@ -1,21 +1,28 @@
-import { LlmError, type LlmProvider } from '@ai-lint/llm'
+import { LlmError, PROMPT_VERSION, type LlmProvider } from '@ai-lint/llm'
 import { defaultRegistry, type RuleRegistry } from '@ai-lint/rules'
 import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { ZodError } from 'zod'
 import { createAuthHook } from './auth.js'
 import { HttpError } from './errors.js'
+import { doctypeRoutes } from './routes/doctype.js'
 import { healthRoutes } from './routes/health.js'
 import { lintRoutes } from './routes/lint.js'
+import { reportsRoutes } from './routes/reports.js'
 import { rulesRoutes } from './routes/rules.js'
 import { DEFAULT_LIMITS, type Limits, type LintDeps } from './services/lint-service.js'
+import { createUnlimitedQuota, type QuotaService } from './services/quota.js'
+import { createMemoryStore, type ReportStore } from './services/report-store.js'
 import { createMemoryRulesetSource, type RulesetSource } from './services/ruleset-source.js'
 
 export interface AppDeps {
   provider: LlmProvider
   serviceToken: string
+  store?: ReportStore
+  quota?: QuotaService
   rulesets?: RulesetSource
   registry?: RuleRegistry
   limits?: Partial<Limits>
+  promptVersion?: number
   now?: () => Date
   logLevel?: string
 }
@@ -46,7 +53,7 @@ function errorHandler(error: FastifyError, request: FastifyRequest, reply: Fasti
 }
 
 /**
- * 목 provider와 인메모리 규칙셋만으로 앱 전체를 띄울 수 있어야 테스트가 라우트를 통째로 검증할 수 있다.
+ * 목 provider와 인메모리 store만으로 앱 전체를 띄울 수 있어야 테스트가 라우트를 통째로 검증할 수 있다.
  * 그래서 buildApp은 의존성을 주입받는 팩토리다.
  */
 export function buildApp(deps: AppDeps): FastifyInstance {
@@ -59,18 +66,22 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     provider: deps.provider,
     rulesets: deps.rulesets ?? createMemoryRulesetSource(),
     registry: deps.registry ?? defaultRegistry,
+    store: deps.store ?? createMemoryStore(),
+    quota: deps.quota ?? createUnlimitedQuota(),
     limits: { ...DEFAULT_LIMITS, ...deps.limits },
+    promptVersion: deps.promptVersion ?? PROMPT_VERSION,
     now: deps.now ?? (() => new Date()),
   }
 
   app.decorateRequest('userId', 'anonymous')
   app.addHook('onRequest', createAuthHook(deps.serviceToken))
-
   app.setErrorHandler(errorHandler)
 
   app.register(healthRoutes)
   app.register(rulesRoutes(lintDeps.rulesets))
   app.register(lintRoutes(lintDeps))
+  app.register(reportsRoutes(lintDeps.store))
+  app.register(doctypeRoutes(lintDeps.store))
 
   return app
 }

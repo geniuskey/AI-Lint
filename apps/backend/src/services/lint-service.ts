@@ -4,6 +4,8 @@ import { activeLlmRules, analyzeContext, inferDocType, type LlmProvider } from '
 import { runRules, scoreFindings, type Finding, type ResolvedRuleset, type RuleRegistry, type Score } from '@ai-lint/rules'
 import { z } from 'zod'
 import { HttpError } from '../errors.js'
+import type { QuotaService } from './quota.js'
+import type { CacheKey, ReportStore } from './report-store.js'
 import type { RulesetSource } from './ruleset-source.js'
 
 export const LintOptionsSchema = z
@@ -60,7 +62,10 @@ export interface LintDeps {
   provider: LlmProvider
   rulesets: RulesetSource
   registry: RuleRegistry
+  store: ReportStore
+  quota: QuotaService
   limits: Limits
+  promptVersion: number
   now: () => Date
 }
 
@@ -95,33 +100,68 @@ function countDeterministicRules(registry: RuleRegistry, ruleset: ResolvedRulese
   }).length
 }
 
+/** 쿼터에 기록할 실제 호출 수를 센다. 요약·유형추론까지 포함해야 상한이 의미를 갖는다. */
+function countingProvider(provider: LlmProvider): { provider: LlmProvider; calls: () => number } {
+  let calls = 0
+  return {
+    provider: {
+      name: provider.name,
+      complete: (req) => {
+        calls++
+        return provider.complete(req)
+      },
+    },
+    calls: () => calls,
+  }
+}
+
 /**
  * 스펙 7장의 검사 파이프라인.
  * 룰 검사는 LLM을 기다리지 않고, LLM이 죽어도 룰 결과는 반드시 나간다.
  */
-export async function lintDocument(input: Document, options: LintOptions, deps: LintDeps): Promise<LintReport> {
+export async function lintDocument(
+  input: Document,
+  options: LintOptions,
+  deps: LintDeps,
+  userId: string,
+): Promise<LintReport> {
   const startedAt = Date.now()
 
   const ruleset = deps.rulesets.get(options.rulesetId)
   if (!ruleset) throw new HttpError(404, `알 수 없는 규칙셋입니다: ${options.rulesetId}`)
 
-  const { doc, truncated } = truncate(input, deps.limits.maxBlocks)
+  const truncation = truncate(input, deps.limits.maxBlocks)
+  // 사용자가 유형을 직접 정했으면 LLM 추론보다 먼저 확정한다. 캐시 키도 이 유형을 반영해야 한다.
+  const doc = await applyDocTypeOverride(truncation.doc, deps.store)
 
-  const skipReason = resolveSkipReason(doc, options, deps.limits)
+  const documentHash = hashDocument(doc)
+  const cacheKey: CacheKey = {
+    documentHash,
+    rulesetId: ruleset.id,
+    rulesetVersion: ruleset.version,
+    promptVersion: deps.promptVersion,
+  }
+
+  const cached = await deps.store.findByKey(cacheKey)
+  if (cached) return { ...cached, cached: true }
+
+  const skipReason = await resolveSkipReason(doc, options, deps, userId)
   const useLlm = skipReason === undefined
 
-  const target = useLlm ? await resolveDocType(doc, deps.provider) : doc
+  const counted = countingProvider(deps.provider)
+  const target = useLlm ? await resolveDocType(doc, counted.provider) : doc
 
   const ruleFindings = runRules(target, ruleset, deps.registry, { now: deps.now() })
-  const llm = useLlm ? await analyzeContext(target, ruleset, deps.provider) : null
+  const llm = useLlm ? await analyzeContext(target, ruleset, counted.provider) : null
+  if (counted.calls() > 0) await deps.quota.record(userId, counted.calls())
 
   const findings = sortFindings([...ruleFindings, ...(llm?.findings ?? [])], target)
   const docType = target.docType.value
 
-  return {
+  const report: LintReport = {
     reportId: randomUUID(),
     documentUri: target.source.uri,
-    documentHash: hashDocument(target),
+    documentHash,
     docType,
     rulesetId: ruleset.id,
     rulesetVersion: ruleset.version,
@@ -136,19 +176,37 @@ export async function lintDocument(input: Document, options: LintOptions, deps: 
     },
     llmStatus: llm?.status ?? 'skipped',
     ...(skipReason ? { llmSkipReason: skipReason } : {}),
-    truncated,
+    truncated: truncation.truncated,
     cached: false,
     createdAt: deps.now().toISOString(),
   }
+
+  if (options.save) {
+    await deps.store.save(report, { promptVersion: deps.promptVersion, userId })
+  }
+
+  return report
 }
 
-function resolveSkipReason(doc: Document, options: LintOptions, limits: Limits): LlmSkipReason | undefined {
+async function resolveSkipReason(
+  doc: Document,
+  options: LintOptions,
+  deps: LintDeps,
+  userId: string,
+): Promise<LlmSkipReason | undefined> {
   if (!options.useLlm) return 'disabled'
-  if (totalTextLength(doc) > limits.llmMaxDocChars) return 'too-large'
+  if (totalTextLength(doc) > deps.limits.llmMaxDocChars) return 'too-large'
+  if (!(await deps.quota.check(userId)).allowed) return 'quota'
   return undefined
 }
 
-/** 클라이언트가 유형을 못 정한 문서만 LLM에 물어본다. 라벨·템플릿으로 정해졌으면 그대로 믿는다. */
+async function applyDocTypeOverride(doc: Document, store: ReportStore): Promise<Document> {
+  const override = await store.getDocTypeOverride(doc.source.uri)
+  if (!override) return doc
+  return { ...doc, docType: { value: override, confidence: 1, origin: 'user' } }
+}
+
+/** 클라이언트가 유형을 못 정한 문서만 LLM에 물어본다. 라벨·템플릿·사용자 지정이면 그대로 믿는다. */
 async function resolveDocType(doc: Document, provider: LlmProvider): Promise<Document> {
   if (doc.docType.origin !== 'llm') return doc
 

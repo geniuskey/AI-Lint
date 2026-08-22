@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ailint
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ailint}
+      POSTGRES_DB: ailint
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ailint -d ailint']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - '5432:5432'
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      DATABASE_URL: postgres://ailint:${POSTGRES_PASSWORD:-ailint}@postgres:5432/ailint
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?SERVICE_TOKEN을 설정하세요}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?GEMINI_API_KEY를 설정하세요}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      LLM_DAILY_LIMIT_PER_USER: ${LLM_DAILY_LIMIT_PER_USER:-200}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8787:8787'
+    restart: unless-stopped
+
+volumes:
+  pgdata:
