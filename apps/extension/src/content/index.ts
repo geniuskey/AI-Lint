@@ -3,9 +3,12 @@ import type { DocType, Document } from '@ai-lint/ir'
 import { PORT_NAME, type ContentMessage, type WorkerMessage } from '../shared/messages.js'
 import { daysAgo, readCached, writeCached } from '../shared/report-cache.js'
 import { loadSettings } from '../shared/settings.js'
+import { locate } from './anchor-locator.js'
+import { highlight } from './highlight.js'
 import { checkLinks } from './link-check.js'
 import { findBaseUrl, findPageId, PageReadError, readPage } from './page-reader.js'
 import { mountPanel, type Panel } from './panel/panel.js'
+import { renderFindings } from './panel/render.js'
 
 const PHASE_STATUS = { rules: '규칙 검사 중…', llm: 'AI 맥락 검사 중…' } as const
 
@@ -45,6 +48,16 @@ async function applyReport(panel: Panel, report: LintReport): Promise<void> {
   panel.setScore(report.score)
   panel.setDocType(report.docType)
   if (report.truncated) panel.setBanner('문서가 너무 커서 앞부분만 검사했습니다.', 'warn')
+
+  renderFindings(panel.body, report.findings, {
+    onLocate: (finding) => {
+      const target = locate(finding.anchor, document)
+      if (target) highlight(target)
+      else panel.setStatus('본문에서 이 위치를 찾지 못했습니다.')
+    },
+    onCopy: (text) => void navigator.clipboard.writeText(text),
+  })
+
   await writeCached(chrome.storage.local, report.documentUri, {
     grade: report.score.grade,
     total: report.score.total,
