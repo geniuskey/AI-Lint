@@ -1,0 +1,18 @@
+[package]
+name = "ai-lint-desktop"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ai_lint_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-http = "2"
+serde = { version = "1", features = ["derive"] }
+keyring = { version = "3", features = ["windows-native"] }

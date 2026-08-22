@@ -37,6 +37,8 @@ export const BlockSchema = z.discriminatedUnion('kind', [
   withBase({
     kind: z.literal('paragraph'),
     text: z.string(),
+    /** 제목 스타일 없이 굵게·크게로 제목을 흉내낸 문단 (STR013) */
+    emphasizedAsHeading: z.boolean().optional(),
   }),
   withBase({
     kind: z.literal('list'),
@@ -77,14 +79,7 @@ export const BlockSchema = z.discriminatedUnion('kind', [
   withBase({
     kind: z.literal('slide'),
     index: z.number().int().positive(),
-    title: z.string().optional(),
     notes: z.string().optional(),
-  }),
-  withBase({
-    kind: z.literal('sheet'),
-    name: z.string(),
-    headers: z.array(z.string()),
-    usedRange: z.string(),
   }),
 ])
 export type Block = z.infer<typeof BlockSchema>

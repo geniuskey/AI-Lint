@@ -57,7 +57,7 @@ rules:
 
 describe('DEFAULT_RULESET', () => {
   it('전체 룰을 활성 상태로 담는다', () => {
-    expect(Object.keys(DEFAULT_RULESET.rules)).toHaveLength(29)
+    expect(Object.keys(DEFAULT_RULESET.rules)).toHaveLength(31)
     expect(Object.values(DEFAULT_RULESET.rules).every((r) => r.enabled)).toBe(true)
   })
 

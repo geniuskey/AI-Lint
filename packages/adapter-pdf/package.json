@@ -1,0 +1,15 @@
+{
+  "name": "@ai-lint/adapter-pdf",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-lint/ir": "workspace:*",
+    "pdfjs-dist": "^4.10.38"
+  }
+}

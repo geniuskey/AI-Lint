@@ -1,5 +1,5 @@
 export * from './anchor.js'
 export * from './schema.js'
+export * from './build.js'
 export * from './walk.js'
 export * from './serialize.js'
-export * from './hash.js'

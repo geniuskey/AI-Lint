@@ -1,5 +1,5 @@
 import type { Block, SourceAnchor } from '@ai-lint/ir'
-import { childOf, childrenOf, findDescendants, tagOf, textOf } from './dom.js'
+import { childOf, childrenOf, findDescendants, tagOf, textOf } from '@ai-lint/xml'
 
 export interface Extracted {
   blocks: Block[]

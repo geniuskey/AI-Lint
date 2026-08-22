@@ -1,0 +1,35 @@
+{
+  "name": "@ai-lint/desktop",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tauri dev",
+    "dev:vite": "vite",
+    "build:vite": "vite build",
+    "build": "tauri build",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-lint/adapter-office": "workspace:*",
+    "@ai-lint/adapter-pdf": "workspace:*",
+    "@ai-lint/backend-client": "workspace:*",
+    "@ai-lint/contract": "workspace:*",
+    "@ai-lint/ir": "workspace:*",
+    "@ai-lint/labels": "workspace:*",
+    "@ai-lint/rules": "workspace:*",
+    "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@tauri-apps/plugin-http": "^2.2.0",
+    "fflate": "^0.8.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^7.0.0"
+  }
+}

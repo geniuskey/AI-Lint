@@ -9,7 +9,8 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ai-lint/ir": "workspace:*"
+    "@ai-lint/ir": "workspace:*",
+    "@ai-lint/xml": "workspace:*"
   },
   "devDependencies": {
     "happy-dom": "^15.11.0"

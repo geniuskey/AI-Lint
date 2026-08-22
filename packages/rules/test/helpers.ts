@@ -1,4 +1,4 @@
-import type { Block, DocType, Document, Link, SourceAnchor } from '@ai-lint/ir'
+import type { Block, DocType, Document, Link, SourceAnchor, SourceKind } from '@ai-lint/ir'
 
 let anchorSeq = 0
 const anchorFor = (exact: string): SourceAnchor => ({
@@ -16,7 +16,16 @@ export const heading = (id: string, level: 1 | 2 | 3 | 4 | 5 | 6, text: string):
   text,
 })
 
-export const para = (id: string, text: string): Block => ({ ...base(id, text), kind: 'paragraph', text })
+export const para = (
+  id: string,
+  text: string,
+  opts: { emphasizedAsHeading?: boolean } = {},
+): Block => ({
+  ...base(id, text),
+  kind: 'paragraph',
+  text,
+  ...(opts.emphasizedAsHeading ? { emphasizedAsHeading: true } : {}),
+})
 
 export const list = (
   id: string,
@@ -102,13 +111,14 @@ export interface MakeDocOptions {
   modifiedAt?: string
   labels?: string[]
   owner?: string
+  sourceKind?: SourceKind
 }
 
 export function makeDoc(blocks: Block[], opts: MakeDocOptions = {}): Document {
   return {
     schemaVersion: 1,
     source: {
-      kind: 'confluence',
+      kind: opts.sourceKind ?? 'confluence',
       uri: 'https://wiki.example.com/pages/1',
       ...(opts.modifiedAt !== undefined ? { modifiedAt: opts.modifiedAt } : {}),
     },

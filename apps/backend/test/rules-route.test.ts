@@ -21,7 +21,7 @@ describe('GET /v1/rules', () => {
   it('전체 카탈로그를 축·심각도와 함께 반환한다', async () => {
     const body = (await get('/v1/rules')).json()
 
-    expect(body.rules).toHaveLength(29)
+    expect(body.rules).toHaveLength(31)
     const ctx001 = body.rules.find((r: RuleRow) => r.id === 'CTX001')
     expect(ctx001.axis).toBe('context')
     expect(ctx001.llm).toBe(true)
@@ -47,7 +47,7 @@ describe('GET /v1/rulesets', () => {
     const body = (await get('/v1/rulesets/default')).json()
 
     expect(body.axisWeights).toEqual({ structure: 0.35, context: 0.45, metadata: 0.2 })
-    expect(Object.keys(body.rules)).toHaveLength(29)
+    expect(Object.keys(body.rules)).toHaveLength(31)
     expect(body.rules.STR001.enabled).toBe(true)
   })
 

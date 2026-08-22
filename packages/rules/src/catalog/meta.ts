@@ -107,6 +107,20 @@ export const RULE_META: Record<string, RuleMeta> = Object.fromEntries(
       defaultSeverity: 'warning',
       description: '내용을 담은 매크로가 텍스트로 추출되지 않았습니다.',
     }),
+    meta({
+      id: 'STR013',
+      name: 'emphasis-as-heading',
+      axis: 'structure',
+      defaultSeverity: 'warning',
+      description: '제목 스타일 대신 굵게·큰 글씨로 제목을 표현했습니다.',
+    }),
+    meta({
+      id: 'STR014',
+      name: 'scanned-pdf',
+      axis: 'structure',
+      defaultSeverity: 'error',
+      description: 'PDF에 텍스트 레이어가 없어 내용을 추출할 수 없습니다.',
+    }),
 
     // ── 맥락 자립성 (LLM) ────────────────────────────────────────────────
     meta({

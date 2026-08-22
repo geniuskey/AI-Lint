@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
+import { childOf, childrenOf, tagOf } from '@ai-lint/xml'
 import { describe, expect, it } from 'vitest'
-import { childOf, childrenOf, findDescendant, parseStorage, tagOf, textOf } from '../src/dom.js'
+import { parseStorage } from '../src/dom.js'
 
 describe('parseStorage', () => {
-  it('네임스페이스 태그 이름을 소문자 콜론 형태로 유지한다', () => {
+  it('네임스페이스 태그 이름과 속성을 유지한다', () => {
     const root = parseStorage('<ac:structured-macro ac:name="info"></ac:structured-macro>')
     const first = root.children[0]!
     expect(tagOf(first)).toBe('ac:structured-macro')
@@ -17,13 +18,8 @@ describe('parseStorage', () => {
     expect(childOf(link, 'ac:link-body')?.textContent).toBe('본문')
   })
 
-  it('findDescendant는 중첩된 요소를 찾는다', () => {
-    const root = parseStorage('<div><section><table><tr><td>값</td></tr></table></section></div>')
-    expect(findDescendant(root, 'td')?.textContent).toBe('값')
-  })
-
-  it('textOf는 공백을 접고 다듬는다', () => {
-    const root = parseStorage('<p>  여러   줄\n  텍스트 </p>')
-    expect(textOf(root.children[0]!)).toBe('여러 줄 텍스트')
+  it('CDATA 본문을 텍스트로 살려낸다', () => {
+    const root = parseStorage('<ac:plain-text-body><![CDATA[const a = 1 < 2]]></ac:plain-text-body>')
+    expect(root.children[0]?.textContent).toBe('const a = 1 < 2')
   })
 })

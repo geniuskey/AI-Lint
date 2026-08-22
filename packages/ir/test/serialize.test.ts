@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { hashDocument, serializeToMarkdown } from '../src/index.js'
+import { hashDocument } from '../src/hash.js'
+import { serializeToMarkdown } from '../src/index.js'
 import { designDoc } from './fixtures/design-doc.js'
 
 describe('serializeToMarkdown', () => {

@@ -1,5 +1,5 @@
 import type { Block, TextQuote } from '@ai-lint/ir'
-import { tagOf } from './dom.js'
+import { tagOf } from '@ai-lint/xml'
 
 const QUOTE_MAX = 120
 const CONTEXT_MAX = 30

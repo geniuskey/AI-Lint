@@ -30,9 +30,7 @@ export function blockText(block: Block): string {
     case 'macro':
       return block.renderedText ?? ''
     case 'slide':
-      return [block.title, block.notes].filter(Boolean).join(' ')
-    case 'sheet':
-      return [block.name, ...block.headers].join(' ')
+      return block.notes ?? ''
   }
 }
 
