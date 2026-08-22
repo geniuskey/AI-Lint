@@ -106,9 +106,24 @@ function addHeading(walker: Walker, el: Element, level: 1 | 2 | 3 | 4 | 5 | 6): 
   add(walker, el, { kind: 'heading', level, text: textOf(el) })
 }
 
+/**
+ * 본문이 없는 ac:link를 Confluence는 대상 제목으로 렌더한다.
+ * storage의 textContent만 보면 그런 문단이 통째로 사라진다.
+ */
+function linkLabelsOf(el: Element): string {
+  return findDescendants(el, 'ac:link')
+    .map((link) => {
+      const page = childOf(link, 'ri:page')
+      const attachment = childOf(link, 'ri:attachment')
+      return page?.getAttribute('ri:content-title') ?? attachment?.getAttribute('ri:filename') ?? ''
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
 function addParagraph(walker: Walker, el: Element): void {
   const images = findDescendants(el, 'ac:image')
-  const text = textOf(el)
+  const text = textOf(el) || linkLabelsOf(el)
   if (text) add(walker, el, { kind: 'paragraph', text })
   for (const image of images) addImage(walker, image)
 }
