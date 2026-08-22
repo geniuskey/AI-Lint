@@ -1576,7 +1576,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
   - `interface Settings { backendUrl: string; serviceToken: string; userId: string; useLlm: boolean; rulesetId: string; autoRun: boolean }`
   - `DEFAULT_SETTINGS: Settings`, `loadSettings(area: SettingsArea): Promise<Settings>`, `saveSettings(area: SettingsArea, patch: Partial<Settings>): Promise<void>`, `isConfigured(settings: Settings): boolean`
   - `interface SettingsArea { get(keys: null): Promise<Record<string, unknown>>; set(items: Record<string, unknown>): Promise<void> }`
-  - `buildManifest(template: object, origins: string[]): object`
+  - `buildManifest(template: object, origins: OriginConfig): object` where `interface OriginConfig { confluenceOrigins: string[]; backendOrigins: string[] }`
 
 - [ ] **Step 1: 패키지 스캐폴드**
 
@@ -1733,7 +1733,11 @@ export interface OriginConfig {
 }
 
 export function buildManifest(template: object, origins: OriginConfig): object {
-  for (const [key, list] of Object.entries(origins)) {
+  const groups: Array<[keyof OriginConfig, string[]]> = [
+    ['confluenceOrigins', origins.confluenceOrigins],
+    ['backendOrigins', origins.backendOrigins],
+  ]
+  for (const [key, list] of groups) {
     if (list.length === 0) throw new Error(`extension.config.json의 ${key}가 비어 있습니다`)
     if (list.some((origin) => origin.includes('<all_urls>'))) {
       throw new Error('<all_urls>는 쓰지 않습니다. 사내 도메인만 지정하세요')

@@ -1,0 +1,20 @@
+{
+  "name": "@ai-lint/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup && tsx scripts/build-assets.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-lint/adapter-confluence": "workspace:*",
+    "@ai-lint/contract": "workspace:*",
+    "@ai-lint/ir": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "happy-dom": "^15.11.0",
+    "tsup": "^8.3.0"
+  }
+}
