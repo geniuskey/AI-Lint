@@ -1,0 +1,14 @@
+{
+  "name": "@ai-lint/labels",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-lint/ir": "workspace:*"
+  }
+}

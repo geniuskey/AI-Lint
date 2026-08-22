@@ -45,5 +45,4 @@ export async function saveSettings(area: SettingsArea, patch: Partial<Settings>)
   await area.set(next)
 }
 
-export const isConfigured = (settings: Settings): boolean =>
-  settings.backendUrl.length > 0 && settings.serviceToken.length > 0
+export { isConfigured } from '@ai-lint/backend-client'

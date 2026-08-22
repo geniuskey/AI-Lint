@@ -1,12 +1,10 @@
-import type { Finding, Severity } from '@ai-lint/contract'
-import { SEVERITY_LABELS } from '../../shared/labels.js'
+import type { Finding } from '@ai-lint/contract'
+import { SEVERITY_LABELS, SEVERITY_ORDER } from '../../shared/labels.js'
 
 export interface FindingHandlers {
   onLocate(finding: Finding): void
   onCopy(text: string): void
 }
-
-const ORDER: Severity[] = ['error', 'warning', 'info']
 
 const el = <K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -66,7 +64,7 @@ export function renderFindings(body: HTMLElement, findings: Finding[], handlers:
     return
   }
 
-  const groups = ORDER.map((severity) => {
+  const groups = SEVERITY_ORDER.map((severity) => {
     const matched = findings.filter((finding) => finding.severity === severity)
     if (matched.length === 0) return null
 

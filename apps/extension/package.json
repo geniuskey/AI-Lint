@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@ai-lint/adapter-confluence": "workspace:*",
+    "@ai-lint/backend-client": "workspace:*",
     "@ai-lint/contract": "workspace:*",
-    "@ai-lint/ir": "workspace:*"
+    "@ai-lint/ir": "workspace:*",
+    "@ai-lint/labels": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",

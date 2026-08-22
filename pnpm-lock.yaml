@@ -60,12 +60,18 @@ importers:
       '@ai-lint/adapter-confluence':
         specifier: workspace:*
         version: link:../../packages/adapter-confluence
+      '@ai-lint/backend-client':
+        specifier: workspace:*
+        version: link:../../packages/backend-client
       '@ai-lint/contract':
         specifier: workspace:*
         version: link:../../packages/contract
       '@ai-lint/ir':
         specifier: workspace:*
         version: link:../../packages/ir
+      '@ai-lint/labels':
+        specifier: workspace:*
+        version: link:../../packages/labels
     devDependencies:
       '@playwright/test':
         specifier: ^1.49.0
@@ -118,6 +124,15 @@ importers:
         specifier: ^4.10.38
         version: 4.10.38
 
+  packages/backend-client:
+    dependencies:
+      '@ai-lint/contract':
+        specifier: workspace:*
+        version: link:../contract
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
+
   packages/contract:
     dependencies:
       '@ai-lint/ir':
@@ -135,6 +150,12 @@ importers:
       zod:
         specifier: ^3.24.0
         version: 3.25.76
+
+  packages/labels:
+    dependencies:
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
 
   packages/llm:
     dependencies:
