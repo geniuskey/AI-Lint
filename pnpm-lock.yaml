@@ -93,6 +93,22 @@ importers:
         specifier: ^15.11.0
         version: 15.11.7
 
+  packages/adapter-office:
+    dependencies:
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
+      '@ai-lint/xml':
+        specifier: workspace:*
+        version: link:../xml
+      fflate:
+        specifier: ^0.8.2
+        version: 0.8.3
+    devDependencies:
+      happy-dom:
+        specifier: ^15.11.0
+        version: 15.11.7
+
   packages/contract:
     dependencies:
       '@ai-lint/ir':
@@ -923,6 +939,9 @@ packages:
   fetch-blob@3.2.0:
     resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
     engines: {node: ^12.20 || >= 14.13}
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   find-my-way@9.9.0:
     resolution: {integrity: sha512-sJsgZ1sQH2UDuowPuMKg8az7Qc8F0jnj+SKkFWU/+T0xcFlgV5skgXOGUqmQzOdmW6ALA7AhJINWx3qFBkbLHA==}
@@ -2071,6 +2090,8 @@ snapshots:
     dependencies:
       node-domexception: 1.0.0
       web-streams-polyfill: 3.3.3
+
+  fflate@0.8.3: {}
 
   find-my-way@9.9.0:
     dependencies:
