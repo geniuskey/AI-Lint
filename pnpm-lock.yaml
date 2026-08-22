@@ -87,6 +87,9 @@ importers:
       '@tauri-apps/plugin-http':
         specifier: ^2.2.0
         version: 2.5.9
+      fflate:
+        specifier: ^0.8.2
+        version: 0.8.3
       react:
         specifier: ^19.0.0
         version: 19.2.8

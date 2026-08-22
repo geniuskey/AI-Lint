@@ -1,13 +1,15 @@
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { useEffect, useRef, useState, type JSX } from 'react'
 import { collectDocuments, extOf, type DocumentFile } from './core/collect.js'
+import { toHtml } from './core/export-html.js'
+import { toXlsx } from './core/export-xlsx.js'
 import { defaultUseLlm, initialJobs, runLintQueue, type JobState } from './core/lint-file.js'
 import { parseDocument } from './core/parse-file.js'
 import {
   DEFAULT_DESKTOP_SETTINGS, loadSettings, saveSettings, toBackendSettings, type DesktopSettings,
 } from './core/settings.js'
 import {
-  fileSystem, pickFiles, pickFolder, readDocument, settingsStore, tokenStore,
+  fileSystem, pickFiles, pickFolder, pickSavePath, readDocument, saveFile, settingsStore, tokenStore,
 } from './platform/tauri.js'
 import { JobTable } from './ui/JobTable.js'
 import { ReportView } from './ui/ReportView.js'
@@ -17,6 +19,8 @@ function fileOfPath(path: string): DocumentFile | null {
   const ext = extOf(name)
   return ext === null ? null : { path, name, ext }
 }
+
+const stamp = (): string => new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
 
 export function App(): JSX.Element {
   const [settings, setSettings] = useState<DesktopSettings>(DEFAULT_DESKTOP_SETTINGS)
@@ -75,6 +79,18 @@ export function App(): JSX.Element {
     }
   }
 
+  const onExportHtml = async (): Promise<void> => {
+    const path = await pickSavePath(`ai-lint-${stamp()}.html`)
+    if (path === null) return
+    await saveFile(path, new TextEncoder().encode(toHtml(jobs, new Date().toLocaleString('ko-KR'))))
+  }
+
+  const onExportXlsx = async (): Promise<void> => {
+    const path = await pickSavePath(`ai-lint-${stamp()}.xlsx`)
+    if (path === null) return
+    await saveFile(path, toXlsx(jobs))
+  }
+
   return (
     <main className="app">
       <h1>AI Lint</h1>
@@ -113,6 +129,12 @@ export function App(): JSX.Element {
         {running ? (
           <button type="button" onClick={() => { cancelRef.current = true }}>취소</button>
         ) : null}
+        <button type="button" onClick={() => void onExportHtml()} disabled={running || jobs.length === 0}>
+          HTML 저장
+        </button>
+        <button type="button" onClick={() => void onExportXlsx()} disabled={running || jobs.length === 0}>
+          Excel 저장
+        </button>
       </section>
 
       <section className="split">
