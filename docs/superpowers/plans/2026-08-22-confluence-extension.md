@@ -3976,8 +3976,15 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
     "lib": ["ES2023", "DOM"],
     "types": ["node", "chrome"]
   },
-  "include": ["src", "test", "scripts", "e2e"]
+  "include": ["src", "test", "scripts", "e2e", "playwright.config.ts"]
 }
+```
+
+`.gitignore`에 Playwright 산출물을 더한다:
+
+```
+test-results/
+playwright-report/
 ```
 
 ```bash
@@ -4010,7 +4017,7 @@ export default defineConfig({
 `apps/extension/e2e/fixtures/report.ts`:
 
 ```typescript
-import type { LintReport } from '@ai-lint/contract'
+import type { Finding, LintReport } from '@ai-lint/contract'
 
 const base = {
   documentUri: 'http://localhost:4181/pages/viewpage.action?pageId=789',
@@ -4024,18 +4031,20 @@ const base = {
   createdAt: '2026-08-22T00:00:00.000Z',
 }
 
-const finding = (id: string, ruleId: string, severity: 'error' | 'warning', message: string, exact: string) => ({
+const QUOTE = '지난번 논의대로 3단계로 나눠서 진행하기로 했습니다.'
+
+const finding = (id: string, ruleId: string, severity: Finding['severity'], message: string): Finding => ({
   id,
   ruleId,
-  axis: 'structure' as const,
+  axis: 'structure',
   severity,
   blockId: 'b2',
-  anchor: { kind: 'confluence' as const, xpath: './p', textQuote: { exact } },
+  anchor: { kind: 'confluence', xpath: './p', textQuote: { exact: QUOTE } },
   message,
   why: 'AI가 이 문서를 읽을 때 맥락을 잃습니다.',
-  evidence: exact,
+  evidence: QUOTE,
   suggestion: { before: '지난번 논의대로', after: '2026-07-10 결제 설계 리뷰에서' },
-  source: 'rule' as const,
+  source: 'rule',
   confidence: 1,
   docsUrl: `https://docs.test/${ruleId.toLowerCase()}.md`,
 })
@@ -4044,7 +4053,7 @@ export const RULES_REPORT: LintReport = {
   ...base,
   reportId: 'rules-1',
   score: { total: 82, grade: 'B', axes: { structure: 85, context: 100, metadata: 60 } },
-  findings: [finding('f1', 'META004', 'warning', '담당자가 없습니다', '지난번 논의대로 3단계로 나눠서 진행하기로 했습니다.')],
+  findings: [finding('f1', 'META004', 'warning', '담당자가 없습니다')],
   llmStatus: 'skipped',
   llmSkipReason: 'disabled',
 }
@@ -4056,7 +4065,7 @@ export const LLM_REPORT: LintReport = {
   findings: [
     RULES_REPORT.findings[0]!,
     {
-      ...finding('f2', 'CTX001', 'error', '앞선 논의를 가리키기만 합니다', '지난번 논의대로 3단계로 나눠서 진행하기로 했습니다.'),
+      ...finding('f2', 'CTX001', 'error', '앞선 논의를 가리키기만 합니다'),
       axis: 'context',
       source: 'llm',
       confidence: 0.82,
@@ -4121,7 +4130,11 @@ const readBody = async (request: IncomingMessage): Promise<string> => {
 }
 
 const send = (response: ServerResponse, status: number, body: string, type: string): void => {
-  response.writeHead(status, { 'content-type': type })
+  response.writeHead(status, {
+    'content-type': type,
+    'access-control-allow-origin': '*',
+    'access-control-allow-headers': '*',
+  })
   response.end(body)
 }
 
@@ -4186,8 +4199,9 @@ test.beforeAll(async () => {
   server = await startMockServer(PORT)
   profile = await mkdtemp(join(tmpdir(), 'ai-lint-'))
   context = await chromium.launchPersistentContext(profile, {
-    // MV3 확장은 headed 크롬에서만 안정적으로 로드된다.
+    // MV3 확장은 headed 크롬에서만 안정적으로 로드된다. headless shell로는 뜨지 않는다.
     headless: false,
+    channel: 'chromium',
     args: [`--disable-extensions-except=${distDir}`, `--load-extension=${distDir}`],
   })
 
@@ -4218,11 +4232,7 @@ test('버튼을 누르면 룰 결과가 먼저 나오고 AI 결과가 뒤따른�
   await expect(fab).toBeVisible()
   await fab.click()
 
-  // 1단계: 룰 검사 결과
-  await expect(page.locator('.grade')).toHaveText('B')
-  await expect(page.locator('.finding')).toHaveCount(1)
-
-  // 2단계: LLM 결과가 덮어쓴다
+  // 목 백엔드는 즉시 답하므로 1단계 화면을 붙잡을 수 없다. 두 단계가 다 일어났는지는 lintCalls로 본다.
   await expect(page.locator('.grade')).toHaveText('C')
   await expect(page.locator('.finding')).toHaveCount(2)
   await expect(page.locator('.src')).toHaveText('AI')
