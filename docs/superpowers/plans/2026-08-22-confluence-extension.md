@@ -3666,72 +3666,108 @@ Expected: PASS (10 tests)
 
 `apps/extension/test/anchor-locator.test.ts`:
 
+happy-dom에는 XPath 구현이 없다(`document.evaluate`도 `XPathResult` 전역도 없다). 그래서 xpath 갈래를 실제로 밟으려면 테스트가 `evaluate`를 흉내 내야 한다.
+
 ```typescript
 // @vitest-environment happy-dom
 import type { SourceAnchor } from '@ai-lint/contract'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { contentRoot, locate } from '../src/content/anchor-locator.js'
 
-const setup = (html: string): globalThis.Document => {
-  const dom = document.implementation.createHTMLDocument('t')
-  dom.body.innerHTML = html
-  return dom
+const anchor = (patch: Partial<Extract<SourceAnchor, { kind: 'confluence' }>>): SourceAnchor => ({
+  kind: 'confluence',
+  xpath: './p[1]',
+  textQuote: { exact: '결제 승인 흐름을 정리한다' },
+  ...patch,
+})
+
+const LONG_PARAGRAPH = '결제 승인 요청은 게이트웨이를 거쳐 원장에 기록되며 실패하면 재시도 큐로 들어간다'
+
+/** happy-dom에는 XPath가 없다. 어댑터가 만드는 './tag[n]' 형태만 흉내 낸다. */
+function stubXPath(): void {
+  const evaluate = (expression: string, context: Node): { singleNodeValue: Node | null } => {
+    if (expression === '.') return { singleNodeValue: context }
+    const parsed = /^\.\/([a-z]+)\[(\d+)\]$/.exec(expression)
+    if (!parsed) throw new Error(`잘못된 XPath: ${expression}`)
+    const [, tag, index] = parsed
+    const matched = Array.from((context as Element).children).filter((c) => c.tagName.toLowerCase() === tag)
+    return { singleNodeValue: matched[Number(index) - 1] ?? null }
+  }
+  document.evaluate = evaluate as unknown as Document['evaluate']
 }
 
-const anchor = (xpath: string, exact: string): SourceAnchor => ({ kind: 'confluence', xpath, textQuote: { exact } })
+beforeEach(() => {
+  document.body.innerHTML = `
+    <div id="main-content">
+      <h2>배경</h2>
+      <p>결제 승인 흐름을 정리한다</p>
+      <p>두 번째   문단이다</p>
+      <p>${LONG_PARAGRAPH}</p>
+      <div class="wrap"><span>깊은 곳의 문장</span></div>
+    </div>
+  `
+  stubXPath()
+})
 
 describe('contentRoot', () => {
   it('본문 컨테이너를 찾는다', () => {
-    const dom = setup('<div id="main-content"><p>본문</p></div>')
-    expect(contentRoot(dom).id).toBe('main-content')
+    expect(contentRoot(document).id).toBe('main-content')
   })
 
   it('본문 컨테이너가 없으면 body를 쓴다', () => {
-    expect(contentRoot(setup('<p>본문</p>')).tagName).toBe('BODY')
+    document.body.innerHTML = '<article><p>컨테이너 밖 문장</p></article>'
+    expect(contentRoot(document).tagName).toBe('BODY')
   })
 })
 
 describe('locate', () => {
-  it('xpath로 찾은 요소가 인용문을 담고 있으면 그것을 쓴다', () => {
-    const dom = setup('<div class="wiki-content"><p>첫째</p><p>둘째 문단</p></div>')
-    expect(locate(anchor('./p[2]', '둘째 문단'), dom)?.textContent).toBe('둘째 문단')
+  it('앵커가 없으면 null이다', () => {
+    expect(locate(null, document)).toBeNull()
+  })
+
+  it('Confluence 앵커가 아니면 null이다', () => {
+    expect(locate({ kind: 'pptx', slide: 1 }, document)).toBeNull()
+  })
+
+  it('xpath가 짚은 요소가 인용문을 담고 있으면 그것을 쓴다', () => {
+    const found = locate(anchor({ xpath: './p[2]', textQuote: { exact: '두 번째 문단이다' } }), document)
+    expect(found?.textContent).toBe('두 번째   문단이다')
   })
 
   it('xpath가 엉뚱한 곳을 짚으면 인용문으로 다시 찾는다', () => {
-    const dom = setup('<div class="wiki-content"><p>첫째</p><p>둘째 문단</p></div>')
     // 렌더된 DOM은 storage와 구조가 달라 인덱스가 어긋날 수 있다.
-    expect(locate(anchor('./p[1]', '둘째 문단'), dom)?.textContent).toBe('둘째 문단')
+    const found = locate(anchor({ xpath: './p[2]' }), document)
+    expect(found?.textContent).toBe('결제 승인 흐름을 정리한다')
   })
 
-  it('xpath가 비어 있어도 인용문으로 찾는다', () => {
-    const dom = setup('<div class="wiki-content"><p>구성도 설명</p></div>')
-    expect(locate(anchor('', '구성도 설명'), dom)?.textContent).toBe('구성도 설명')
-  })
-
-  it('망가진 xpath에도 죽지 않는다', () => {
-    const dom = setup('<div class="wiki-content"><p>둘째 문단</p></div>')
-    expect(locate(anchor('./ac:image[[', '둘째 문단'), dom)?.textContent).toBe('둘째 문단')
-  })
-
-  it('가장 안쪽 요소를 고른다', () => {
-    const dom = setup('<div class="wiki-content"><div><section><p>깊은 문단</p></section></div></div>')
-    expect(locate(anchor('', '깊은 문단'), dom)?.tagName).toBe('P')
+  it('망가진 xpath여도 죽지 않고 인용문으로 넘어간다', () => {
+    const found = locate(anchor({ xpath: './ac:image[[' }), document)
+    expect(found?.textContent).toBe('결제 승인 흐름을 정리한다')
   })
 
   it('공백 차이를 무시한다', () => {
-    const dom = setup('<div class="wiki-content"><p>여러   줄\n  텍스트</p></div>')
-    expect(locate(anchor('', '여러 줄 텍스트'), dom)).not.toBeNull()
+    const found = locate(anchor({ xpath: '', textQuote: { exact: '두 번째 문단이다' } }), document)
+    expect(found?.tagName).toBe('P')
   })
 
-  it('찾지 못하면 null을 준다', () => {
-    const dom = setup('<div class="wiki-content"><p>첫째</p></div>')
-    expect(locate(anchor('', '없는 문장'), dom)).toBeNull()
+  it('인용문을 감싼 가장 깊은 요소를 고른다', () => {
+    const found = locate(anchor({ xpath: '', textQuote: { exact: '깊은 곳의 문장' } }), document)
+    expect(found?.tagName).toBe('SPAN')
   })
 
-  it('confluence 앵커가 아니면 찾지 않는다', () => {
-    const dom = setup('<div class="wiki-content"><p>첫째</p></div>')
-    expect(locate({ kind: 'pptx', slide: 1 }, dom)).toBeNull()
-    expect(locate(null, dom)).toBeNull()
+  it('긴 인용문은 앞부분만으로 찾는다', () => {
+    const edited = `${LONG_PARAGRAPH} 그리고 나중에 덧붙은 문장이다`
+    const found = locate(anchor({ xpath: '', textQuote: { exact: edited } }), document)
+    expect(found?.textContent).toBe(LONG_PARAGRAPH)
+  })
+
+  it('어디에도 없으면 null이다', () => {
+    expect(locate(anchor({ xpath: '', textQuote: { exact: '없는 문장' } }), document)).toBeNull()
+  })
+
+  it('본문 전체가 걸리면 쓸모없는 위치라 null이다', () => {
+    expect(locate(anchor({ xpath: '.', textQuote: { exact: '배경' } }), document)?.tagName).toBe('H2')
+    expect(locate(anchor({ xpath: '.', textQuote: { exact: '없는 문장' } }), document)).toBeNull()
   })
 })
 ```
@@ -3748,13 +3784,18 @@ Expected: FAIL — `Cannot find module '../src/content/anchor-locator.js'`
 ```typescript
 import type { SourceAnchor } from '@ai-lint/contract'
 
+/** Confluence 스킨마다 본문 래퍼가 다르다. 앞에서부터 먼저 걸리는 것을 쓴다. */
 const CONTENT_SELECTORS = ['#main-content', '.wiki-content', '#content']
+
 /** 인용문이 길수록 렌더 차이로 어긋날 확률이 높다. 앞부분만 본다. */
 const NEEDLE_MAX = 40
 
+/** XPathResult.FIRST_ORDERED_NODE_TYPE. 전역 XPathResult가 없는 DOM 구현도 있어 값으로 쓴다. */
+const FIRST_ORDERED_NODE = 9
+
 const normalize = (text: string | null): string => (text ?? '').replace(/\s+/g, ' ').trim()
 
-export function contentRoot(dom: globalThis.Document): Element {
+export function contentRoot(dom: Document): Element {
   for (const selector of CONTENT_SELECTORS) {
     const found = dom.querySelector(selector)
     if (found) return found
@@ -3762,11 +3803,11 @@ export function contentRoot(dom: globalThis.Document): Element {
   return dom.body
 }
 
-function byXPath(xpath: string, root: Element, dom: globalThis.Document): Element | null {
+function byXPath(xpath: string, root: Element, dom: Document): Element | null {
+  if (typeof dom.evaluate !== 'function') return null
   try {
-    const result = dom.evaluate(xpath, root, null, 9 /* FIRST_ORDERED_NODE_TYPE */, null)
-    const node = result.singleNodeValue
-    return node instanceof Element ? node : null
+    const node = dom.evaluate(xpath, root, null, FIRST_ORDERED_NODE, null).singleNodeValue
+    return node?.nodeType === Node.ELEMENT_NODE ? (node as Element) : null
   } catch {
     // 어댑터가 만든 xpath는 storage 기준이라 렌더된 DOM에서 문법 오류가 날 수 있다.
     return null
@@ -3782,7 +3823,7 @@ function deepestMatch(el: Element, needle: string): Element | null {
   return el
 }
 
-export function locate(anchor: SourceAnchor | null, dom: globalThis.Document): Element | null {
+export function locate(anchor: SourceAnchor | null, dom: Document): Element | null {
   if (!anchor || anchor.kind !== 'confluence') return null
 
   const root = contentRoot(dom)
@@ -3791,8 +3832,9 @@ export function locate(anchor: SourceAnchor | null, dom: globalThis.Document): E
 
   // xpath는 storage 기준이라 렌더된 DOM에서 빗나갈 수 있다. 인용문으로 검증한 뒤에만 믿는다.
   const candidate = anchor.xpath ? byXPath(anchor.xpath, root, dom) : null
-  if (candidate && normalize(candidate.textContent).includes(needle)) return candidate
+  if (candidate && candidate !== root && normalize(candidate.textContent).includes(needle)) return candidate
 
+  // 본문 전체를 가리키는 건 위치를 못 찾은 것과 같다.
   const found = deepestMatch(root, needle)
   return found === root ? null : found
 }
@@ -3805,6 +3847,7 @@ const CLASS = 'ai-lint-highlight'
 const STYLE_ID = 'ai-lint-highlight-style'
 const DURATION_MS = 2400
 
+// Confluence 본문 스타일에 밀리지 않도록 !important를 쓴다.
 const STYLE = `
 .${CLASS} {
   outline: 2px solid #f59e0b !important;
@@ -3815,28 +3858,28 @@ const STYLE = `
 `
 
 /** 강조 대상은 페이지 본문이라 패널의 shadow DOM 스타일이 닿지 않는다. 문서에 한 번만 심는다. */
-function ensureStyle(dom: globalThis.Document): void {
-  if (dom.getElementById(STYLE_ID)) return
-  const style = dom.createElement('style')
+function ensureStyle(doc: Document): void {
+  if (doc.getElementById(STYLE_ID)) return
+  const style = doc.createElement('style')
   style.id = STYLE_ID
   style.textContent = STYLE
-  dom.head.append(style)
+  doc.head.append(style)
 }
 
-export function highlight(el: Element, dom: globalThis.Document = document): void {
-  ensureStyle(dom)
-  for (const previous of Array.from(dom.querySelectorAll(`.${CLASS}`))) previous.classList.remove(CLASS)
-
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  el.classList.add(CLASS)
-  setTimeout(() => el.classList.remove(CLASS), DURATION_MS)
+export function highlight(target: Element, durationMs: number = DURATION_MS): void {
+  const doc = target.ownerDocument
+  ensureStyle(doc)
+  doc.querySelectorAll(`.${CLASS}`).forEach((previous) => previous.classList.remove(CLASS))
+  target.classList.add(CLASS)
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  setTimeout(() => target.classList.remove(CLASS), durationMs)
 }
 ```
 
 - [ ] **Step 8: 통과 확인**
 
 Run: `pnpm vitest run apps/extension/test/anchor-locator.test.ts`
-Expected: PASS (10 tests)
+Expected: PASS (12 tests)
 
 - [ ] **Step 9: content script에 연결한다**
 
