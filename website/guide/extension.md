@@ -2,6 +2,10 @@
 
 Manifest V3 크롬 확장. Confluence 페이지 좌하단에 **AI Lint** 버튼을 띄우고, 검사 결과를 같은 페이지 위에 보여줍니다.
 
+![Confluence 페이지 좌하단에 떠 있는 AI Lint 버튼](/shots/extension-fab.png)
+
+*버튼은 페이지 어디를 스크롤해도 좌하단에 고정됩니다. 지난 검사 결과가 있으면 등급이 배지로 붙습니다.*
+
 ## 동작 순서
 
 ```
@@ -56,6 +60,8 @@ pnpm --filter @ai-lint/extension build
 
 확장 옵션 페이지에서 지정합니다. 값은 `chrome.storage.sync`에 들어갑니다.
 
+![확장 옵션 페이지. 백엔드 주소, 서비스 토큰, 사용자 ID, 규칙셋, AI 맥락 검사 사용 여부](/shots/extension-options.png)
+
 | 항목 | 기본값 | 설명 |
 |---|---|---|
 | `backendUrl` | 빈 값 | 끝의 `/`는 자동으로 잘립니다 |
@@ -69,7 +75,11 @@ pnpm --filter @ai-lint/extension build
 
 ## 패널
 
+![검사 결과 패널. 등급 C와 축별 점수, META007·CTX001·STR005 지적, 수정 제안의 전후 비교](/shots/extension-panel.png)
+
 지적은 심각도순으로 정렬되어 나옵니다. 항목을 누르면 본문의 해당 위치가 강조됩니다.
+
+`AI` 배지가 붙은 것은 LLM 판정입니다. 수정 제안이 있으면 전후를 나란히 보여주고, **제안 복사**로 바로 가져갈 수 있습니다. 상단의 문서 유형은 추론값이며, 틀렸으면 골라서 다시 검사할 수 있습니다.
 
 강조 위치는 `SourceAnchor`로 찾습니다. Confluence 앵커는 XPath와 인용 텍스트를 **둘 다** 갖고 있는데, 렌더된 DOM은 스토리지 포맷과 구조가 달라 XPath가 빗나가는 일이 흔하기 때문입니다. XPath로 먼저 찾고, 실패하면 인용 텍스트(W3C Web Annotation의 TextQuoteSelector 방식)로 다시 찾습니다.
 
