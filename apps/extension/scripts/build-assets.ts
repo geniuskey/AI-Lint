@@ -46,9 +46,13 @@ async function main(): Promise<void> {
         backendOrigins: (config['backendOrigins'] as string[] | undefined) ?? [],
       }
 
-  await mkdir(resolve(root, 'dist'), { recursive: true })
+  await mkdir(resolve(root, 'dist/icons'), { recursive: true })
   await writeFile(resolve(root, 'dist/manifest.json'), `${JSON.stringify(buildManifest(template, origins), null, 2)}\n`)
   await copyFile(resolve(root, 'src/options/options.html'), resolve(root, 'dist/options.html'))
+  // manifest의 icons 키와 같은 목록. `pnpm icons`가 assets/logo.svg에서 만든다.
+  for (const size of [16, 32, 48, 128]) {
+    await copyFile(resolve(root, `src/icons/${size}.png`), resolve(root, `dist/icons/${size}.png`))
+  }
 }
 
 if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))) {

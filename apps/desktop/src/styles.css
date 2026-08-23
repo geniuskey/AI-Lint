@@ -1,6 +1,7 @@
 :root { font-family: 'Malgun Gothic', system-ui, sans-serif; font-size: 14px; color: #1a1a1a; }
 body { margin: 0; background: #f6f7f9; }
 .app { max-width: 1000px; margin: 0 auto; padding: 24px; }
+.app > h1 { display: flex; align-items: center; gap: 10px; }
 .settings { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin-bottom: 16px; }
 .settings label { display: grid; gap: 4px; }
 input, select { padding: 6px 8px; border: 1px solid #c7cbd1; border-radius: 4px; font: inherit; }

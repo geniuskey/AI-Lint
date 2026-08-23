@@ -75,6 +75,7 @@ apps/
   desktop             Tauri v2 + React 19
 
 website/              문서 사이트 (VitePress)
+assets/logo.svg       모든 아이콘의 원본 — 고친 뒤 `pnpm icons`
 ```
 
 Confluence 스토리지 XHTML, PPTX, DOCX, XLSX, PDF는 어댑터를 거쳐 하나의 IR로 수렴합니다. 룰은 IR만 보므로 문서가 어디서 왔는지 알 필요가 없습니다. 새 형식을 지원하려면 어댑터 하나만 추가하면 됩니다.

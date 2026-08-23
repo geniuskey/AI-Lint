@@ -3,6 +3,8 @@ import { defineConfig } from 'tsup'
 const common = {
   target: 'chrome116',
   platform: 'browser' as const,
+  // 로고를 문자열로 들여와 shadow DOM에 직접 심는다. 확장 파일을 페이지에 노출하지 않아도 된다.
+  loader: { '.svg': 'text' },
   outDir: 'dist',
   outExtension: () => ({ js: '.js' }),
   splitting: false,

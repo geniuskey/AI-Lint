@@ -10,6 +10,8 @@ export const PANEL_STYLES = `
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3); cursor: pointer;
 }
 .fab:hover { background: #334155; }
+.mark { display: flex; }
+.mark svg { width: 18px; height: 18px; }
 .badge:empty { display: none; }
 .badge {
   min-width: 20px; padding: 1px 6px; border-radius: 6px;
