@@ -6,7 +6,7 @@
 
 - Node.js 22 이상
 - pnpm 10.27 이상 (`corepack enable`)
-- LLM 접근 수단 — Gemini API 키, 또는 OpenAI 호환 엔드포인트 ([사내 라우터 연결](/guide/backend#사내-llm-라우터-연결))
+- LLM 접근 수단 — OpenAI 호환 엔드포인트 ([사내 라우터 연결](/guide/backend#사내-llm-라우터-연결)), 또는 Gemini API 키
 - Postgres 16 (선택 — 없으면 메모리 저장소로 뜹니다)
 - Rust 툴체인 (데스크톱 앱을 빌드할 때만)
 
@@ -27,7 +27,11 @@ pnpm test
 
 ```bash
 export SERVICE_TOKEN=$(openssl rand -hex 24)
-export GEMINI_API_KEY=...
+export LLM_BASE_URL=https://llm.mycorp.com/v1
+export LLM_MODEL=internal-gpt-4o
+export LLM_API_KEY=...
+export LLM_AUTH_HEADER=x-llm-token
+export LLM_HEADERS='{"x-dept-code":"AI-PLATFORM"}'
 docker compose up -d
 curl http://localhost:8787/v1/health
 # {"status":"ok"}
@@ -35,16 +39,14 @@ curl http://localhost:8787/v1/health
 
 `SERVICE_TOKEN`은 16자 이상이어야 합니다. 짧으면 부팅 시 죽습니다.
 
-사내 LLM 라우터를 쓴다면 `GEMINI_API_KEY` 대신 이쪽입니다.
+`LLM_AUTH_HEADER`와 `LLM_HEADERS`는 라우터가 요구하는 값에 맞춰 바꾸세요. 기본값은 `Authorization: Bearer <토큰>`입니다. 자세한 것은 [사내 LLM 라우터 연결](/guide/backend#사내-llm-라우터-연결).
+
+Gemini API에 직접 붙이려면 이쪽입니다.
 
 ```bash
 export SERVICE_TOKEN=$(openssl rand -hex 24)
-export LLM_PROVIDER=openai
-export LLM_BASE_URL=https://llm.mycorp.com/v1
-export LLM_MODEL=internal-gpt-4o
-export LLM_API_KEY=...
-export LLM_AUTH_HEADER=x-llm-token
-export LLM_HEADERS='{"x-dept-code":"AI-PLATFORM"}'
+export LLM_PROVIDER=gemini
+export GEMINI_API_KEY=...
 docker compose up -d
 ```
 

@@ -41,13 +41,15 @@ pnpm install
 pnpm test
 
 export SERVICE_TOKEN=$(openssl rand -hex 24)   # 16자 이상
-export GEMINI_API_KEY=...
+export LLM_BASE_URL=https://llm.mycorp.com/v1
+export LLM_MODEL=internal-gpt-4o
+export LLM_API_KEY=...
 docker compose up -d
 
 curl http://localhost:8787/v1/health
 ```
 
-사내 LLM 라우터(OpenAI 호환)를 쓴다면 `LLM_PROVIDER=openai`로 붙입니다. 토큰을 실을 헤더 이름과 라우터가 요구하는 필수 헤더를 지정할 수 있습니다 — [연결 방법](https://geniuskey.github.io/AI-Lint/guide/backend#사내-llm-라우터-연결).
+기본 프로바이더는 OpenAI 호환 엔드포인트입니다. 사내 LLM 라우터를 전제로 하기 때문에 토큰을 실을 헤더 이름(`LLM_AUTH_HEADER`)과 라우터가 요구하는 필수 헤더(`LLM_HEADERS`)를 지정할 수 있습니다 — [연결 방법](https://geniuskey.github.io/AI-Lint/guide/backend#사내-llm-라우터-연결). Gemini API에 직접 붙이려면 `LLM_PROVIDER=gemini`에 `GEMINI_API_KEY`를 주면 됩니다.
 
 확장과 데스크톱 앱 설치는 [빠른 시작](https://geniuskey.github.io/AI-Lint/guide/getting-started)을 보세요.
 
@@ -58,7 +60,7 @@ packages/
   ir                  문서 중간 표현 — 스키마, 앵커, 해시, 순회
   xml                 XML 파서 (어댑터 공용)
   rules               룰 카탈로그, 실행기, 채점, 규칙셋
-  llm                 LLM 프로바이더(Gemini / OpenAI 호환), 프롬프트, 근거 대조
+  llm                 LLM 프로바이더(OpenAI 호환 / Gemini), 프롬프트, 근거 대조
   trace               식별자 추출, 그래프, TRC 룰, 상충 탐지
   contract            요청·응답 타입과 Zod 스키마
   backend-client      확장·데스크톱이 공유하는 HTTP 클라이언트
