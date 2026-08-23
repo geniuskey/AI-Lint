@@ -83,9 +83,9 @@ describe('titleFrom', () => {
 })
 
 describe('makeDocument', () => {
-  it('문서 유형은 모른다고 표시한다', () => {
+  it('문서 유형은 백엔드가 분류하도록 llm으로 넘긴다', () => {
     const doc = makeDocument('docx', { uri: 'C:\\a.docx' }, '제목', [])
-    expect(doc.docType).toEqual({ value: 'unknown', confidence: 0, origin: 'template' })
+    expect(doc.docType).toEqual({ value: 'unknown', confidence: 0, origin: 'llm' })
   })
 
   it('수정 시각과 작성자가 있으면 담고 없으면 키를 빼둔다', () => {
