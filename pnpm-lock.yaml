@@ -38,6 +38,9 @@ importers:
       '@ai-lint/rules':
         specifier: workspace:*
         version: link:../../packages/rules
+      '@ai-lint/trace':
+        specifier: workspace:*
+        version: link:../../packages/trace
       fastify:
         specifier: ^5.2.0
         version: 5.12.1
