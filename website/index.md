@@ -5,6 +5,9 @@ hero:
   name: AI-Lint
   text: 문서가 AI에게 읽히는지 검사합니다
   tagline: 레거시 위키와 오피스 문서를 룰과 LLM으로 함께 진단하고, 어디를 어떻게 고칠지 알려줍니다.
+  image:
+    src: /favicon.svg
+    alt: AI-Lint
   actions:
     - theme: brand
       text: 빠른 시작

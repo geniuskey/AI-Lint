@@ -95,7 +95,10 @@ export function App(): JSX.Element {
 
   return (
     <main className="app">
-      <h1>AI Lint</h1>
+      <h1>
+        <img src="/logo.svg" alt="" width="28" height="28" />
+        AI Lint
+      </h1>
 
       <nav className="tabs">
         <button type="button" className={tab === 'lint' ? 'active' : ''} onClick={() => setTab('lint')}>

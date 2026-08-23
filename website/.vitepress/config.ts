@@ -11,6 +11,9 @@ export default defineConfig({
   lastUpdated: true,
 
   head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/AI-Lint/favicon.svg' }],
+    ['link', { rel: 'alternate icon', type: 'image/png', href: '/AI-Lint/favicon-32.png' }],
+    ['link', { rel: 'apple-touch-icon', href: '/AI-Lint/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#3f7ac2' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'AI-Lint' }],
@@ -24,6 +27,8 @@ export default defineConfig({
   ],
 
   themeConfig: {
+    logo: '/favicon.svg',
+
     nav: [
       { text: '가이드', link: '/guide/', activeMatch: '/guide/' },
       { text: '룰 카탈로그', link: '/rules/', activeMatch: '/rules/' },

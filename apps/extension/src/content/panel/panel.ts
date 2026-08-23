@@ -1,6 +1,7 @@
 import type { Grade, Score } from '@ai-lint/contract'
 import type { DocType } from '@ai-lint/ir'
 import { AXIS_LABELS, DOC_TYPE_LABELS, DOC_TYPES } from '../../shared/labels.js'
+import logoSvg from '../../icons/logo.svg'
 import { PANEL_STYLES } from './styles.js'
 
 export type BannerTone = 'warn' | 'error'
@@ -27,7 +28,7 @@ export interface Panel {
 const HOST_ID = 'ai-lint-root'
 
 const TEMPLATE = `
-<button class="fab" type="button">AI Lint<span class="badge"></span></button>
+<button class="fab" type="button"><span class="mark" aria-hidden="true">${logoSvg}</span>AI Lint<span class="badge"></span></button>
 <aside class="panel">
   <header>
     <h1>AI Lint</h1>
