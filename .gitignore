@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .turbo/
+.vitepress/cache/
 coverage/
 test-results/
 playwright-report/
