@@ -82,6 +82,7 @@ export interface Score {
   axes: AxisScores
 }
 
-export const RULE_DOCS_BASE = 'https://github.com/geniuskey/AI-Lint/blob/main/docs/rules'
+/** 룰 카탈로그 페이지. 룰마다 `#str001` 형태의 앵커가 있다. */
+export const RULE_DOCS_BASE = 'https://geniuskey.github.io/AI-Lint/rules/'
 
-export const docsUrlFor = (ruleId: string): string => `${RULE_DOCS_BASE}/${ruleId.toLowerCase()}.md`
+export const docsUrlFor = (ruleId: string): string => `${RULE_DOCS_BASE}#${ruleId.toLowerCase()}`
