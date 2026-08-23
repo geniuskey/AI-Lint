@@ -34,7 +34,23 @@ export function buildManifest(template: object, origins: OriginConfig): object {
 const readJson = async (path: string): Promise<Record<string, unknown>> =>
   JSON.parse(await readFile(path, 'utf8')) as Record<string, unknown>
 
-async function main(): Promise<void> {
+/**
+ * 확장에는 node_modules도 import map도 없다. 번들에 bare specifier가 남으면 그 파일은
+ * 로드 시점에 통째로 죽는다 — 서비스 워커든 옵션 페이지든 조용히 아무 일도 하지 않게 된다.
+ */
+export function bareImports(code: string): string[] {
+  const found = [...code.matchAll(/\bfrom\s*["']([^."'/][^"']*)["']/g)].map(([, specifier]) => specifier as string)
+  return [...new Set(found)]
+}
+
+async function assertBundled(files: string[]): Promise<void> {
+  for (const file of files) {
+    const bare = bareImports(await readFile(resolve(root, 'dist', file), 'utf8'))
+    if (bare.length > 0) throw new Error(`dist/${file}에 번들되지 않은 import가 남았습니다: ${bare.join(', ')}`)
+  }
+}
+
+export async function writeAssets(): Promise<void> {
   const config = await readJson(resolve(root, 'extension.config.json'))
   const template = await readJson(resolve(root, 'src/manifest.template.json'))
   // 로컬 목 서버를 상대로 E2E를 돌릴 때만 origin을 갈아끼운다. 목 서버가 Confluence와 백엔드를 겸한다.
@@ -46,6 +62,8 @@ async function main(): Promise<void> {
         backendOrigins: (config['backendOrigins'] as string[] | undefined) ?? [],
       }
 
+  await assertBundled(['content.js', 'sw.js', 'options.js'])
+
   await mkdir(resolve(root, 'dist/icons'), { recursive: true })
   await writeFile(resolve(root, 'dist/manifest.json'), `${JSON.stringify(buildManifest(template, origins), null, 2)}\n`)
   await copyFile(resolve(root, 'src/options/options.html'), resolve(root, 'dist/options.html'))
@@ -56,5 +74,5 @@ async function main(): Promise<void> {
 }
 
 if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))) {
-  await main()
+  await writeAssets()
 }

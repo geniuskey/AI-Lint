@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsup && tsx scripts/build-assets.ts",
     "typecheck": "tsc -p tsconfig.json",
-    "test:e2e": "pnpm build && playwright test"
+    "test:e2e": "pnpm build && tsx e2e/prepare.ts && playwright test"
   },
   "dependencies": {
     "@ai-lint/adapter-confluence": "workspace:*",

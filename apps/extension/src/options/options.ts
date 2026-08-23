@@ -29,6 +29,22 @@ async function fillRulesets(selected: string): Promise<void> {
   }
 }
 
+// 저장 버튼은 먼저 살려둔다. 설정을 읽어오는 동안 누른 클릭이 사라지면 안 된다.
+el('save').addEventListener('click', () => {
+  void saveSettings(area, {
+    backendUrl: el<HTMLInputElement>('backendUrl').value,
+    serviceToken: el<HTMLInputElement>('serviceToken').value,
+    userId: el<HTMLInputElement>('userId').value,
+    useLlm: el<HTMLInputElement>('useLlm').checked,
+    autoRun: el<HTMLInputElement>('autoRun').checked,
+    rulesetId: el<HTMLSelectElement>('rulesetId').value,
+  }).then(() => {
+    const status = el('status')
+    status.textContent = '저장했습니다'
+    setTimeout(() => (status.textContent = ''), 2000)
+  })
+})
+
 async function init(): Promise<void> {
   const settings = await loadSettings(area)
   el<HTMLInputElement>('backendUrl').value = settings.backendUrl
@@ -37,21 +53,6 @@ async function init(): Promise<void> {
   el<HTMLInputElement>('useLlm').checked = settings.useLlm
   el<HTMLInputElement>('autoRun').checked = settings.autoRun
   await fillRulesets(settings.rulesetId || DEFAULT_SETTINGS.rulesetId)
-
-  el('save').addEventListener('click', () => {
-    void saveSettings(area, {
-      backendUrl: el<HTMLInputElement>('backendUrl').value,
-      serviceToken: el<HTMLInputElement>('serviceToken').value,
-      userId: el<HTMLInputElement>('userId').value,
-      useLlm: el<HTMLInputElement>('useLlm').checked,
-      autoRun: el<HTMLInputElement>('autoRun').checked,
-      rulesetId: el<HTMLSelectElement>('rulesetId').value,
-    }).then(() => {
-      const status = el('status')
-      status.textContent = '저장했습니다'
-      setTimeout(() => (status.textContent = ''), 2000)
-    })
-  })
 }
 
 void init()

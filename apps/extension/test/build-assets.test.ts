@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildManifest } from '../scripts/build-assets.js'
+import { bareImports, buildManifest } from '../scripts/build-assets.js'
 
 const template = {
   manifest_version: 3,
@@ -50,5 +50,27 @@ describe('buildManifest', () => {
   it('템플릿을 변형하지 않는다', () => {
     buildManifest(template, origins)
     expect(template.host_permissions).toEqual([])
+  })
+})
+
+describe('bareImports', () => {
+  it('번들되지 않고 남은 워크스페이스 import를 찾는다', () => {
+    expect(bareImports('import { isConfigured } from "@ai-lint/backend-client";')).toEqual(['@ai-lint/backend-client'])
+  })
+
+  it('re-export도 잡는다', () => {
+    expect(bareImports("export { x } from 'fflate'")).toEqual(['fflate'])
+  })
+
+  it('같은 모듈은 한 번만 보고한다', () => {
+    expect(bareImports('import a from "zod";\nimport b from "zod";')).toEqual(['zod'])
+  })
+
+  it('상대 경로와 확장 내부 경로는 통과시킨다', () => {
+    expect(bareImports('import a from "./x.js";\nimport b from "../y.js";\nimport c from "/z.js";')).toEqual([])
+  })
+
+  it('번들된 코드에는 남는 것이 없다', () => {
+    expect(bareImports('var a = 1;\nfunction from(x) { return x }\n')).toEqual([])
   })
 })
