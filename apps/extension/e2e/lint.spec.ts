@@ -4,10 +4,10 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium, expect, test, type BrowserContext } from '@playwright/test'
 import { startMockServer, type MockServer } from './mock-server.js'
+import { PORT } from './origin.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distDir = resolve(here, '../dist')
-const PORT = 4181
 
 let server: MockServer
 let context: BrowserContext
