@@ -116,10 +116,10 @@ import { DEFAULT_TRACE_CONFIG } from '../src/config.js'
 import { extractIds } from '../src/ids.js'
 
 const heading = (id: string, text: string): Block =>
-  ({ id, path: [0], anchor: null, kind: 'heading', level: 1, text })
+  ({ id, path: [0], anchor: ANCHOR, kind: 'heading', level: 1, text })
 
 const para = (id: string, text: string): Block =>
-  ({ id, path: [0], anchor: null, kind: 'paragraph', text })
+  ({ id, path: [0], anchor: ANCHOR, kind: 'paragraph', text })
 
 const docOf = (over: Partial<Document> = {}): Document => ({
   schemaVersion: 1,
@@ -316,7 +316,7 @@ import { normalizeUri, referencedIds, toIndexEntry, type DocIndexEntry } from '.
 import { buildGraph } from '../src/graph.js'
 
 const para = (id: string, text: string): Block =>
-  ({ id, path: [0], anchor: null, kind: 'paragraph', text })
+  ({ id, path: [0], anchor: ANCHOR, kind: 'paragraph', text })
 
 const docOf = (over: Partial<Document> = {}): Document => ({
   schemaVersion: 1,
@@ -1603,7 +1603,7 @@ const docOf = (uri: string, title: string, text: string, docType: Document['docT
   source: { kind: 'confluence', uri },
   title,
   docType: { value: docType, confidence: 1, origin: 'label' },
-  blocks: [{ id: 'b1', path: [0], anchor: null, kind: 'paragraph', text }],
+  blocks: [{ id: 'b1', path: [0], anchor: ANCHOR, kind: 'paragraph', text }],
   links: [],
   metadata: { labels: [] },
 })

@@ -242,6 +242,24 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
 
+  packages/trace:
+    dependencies:
+      '@ai-lint/contract':
+        specifier: workspace:*
+        version: link:../contract
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
+      '@ai-lint/llm':
+        specifier: workspace:*
+        version: link:../llm
+      '@ai-lint/rules':
+        specifier: workspace:*
+        version: link:../rules
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+
   packages/xml:
     devDependencies:
       happy-dom:
