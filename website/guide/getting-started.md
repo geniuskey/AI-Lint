@@ -113,6 +113,8 @@ curl -s http://localhost:8787/v1/lint \
 
 5. Confluence 페이지를 열면 좌하단에 **AI Lint** 버튼이 나타납니다.
 
+![Confluence 페이지 좌하단의 AI Lint 버튼](/shots/extension-fab.png)
+
 자세한 내용은 [Confluence 확장](/guide/extension).
 
 ## 데스크톱 앱 실행
@@ -135,3 +137,4 @@ pnpm --filter @ai-lint/desktop build   # 설치 파일 생성
 | `pnpm build` | 전체 빌드 |
 | `pnpm --filter @ai-lint/extension test:e2e` | 확장 Playwright E2E |
 | `pnpm --filter @ai-lint/website dev` | 이 문서 사이트 로컬 실행 |
+| `pnpm shots` | 이 문서의 스크린샷을 실제 앱에서 다시 찍기 |

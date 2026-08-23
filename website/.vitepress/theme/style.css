@@ -108,3 +108,30 @@
 .vp-doc td code {
   white-space: nowrap;
 }
+
+/* 스크린샷 ------------------------------------------------------------- */
+
+/* 본문 이미지는 전부 `pnpm shots`가 실제 앱에서 찍은 화면이다. */
+.vp-doc img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  box-shadow: 0 20px 44px -30px rgba(15, 42, 79, 0.75);
+}
+
+/* 흰 배경에서 찍은 화면이라 다크 모드에서 혼자 발광한다. 살짝 죽인다. */
+.dark .vp-doc img {
+  filter: brightness(0.85) contrast(1.03);
+}
+
+/* 이미지 바로 아래 인용문은 캡션으로 쓴다. */
+.vp-doc img + em,
+.vp-doc p:has(img) + p > em:only-child {
+  display: block;
+  margin-top: 10px;
+  color: var(--vp-c-text-3);
+  font-size: 13px;
+  font-style: normal;
+  text-align: center;
+}

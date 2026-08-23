@@ -16,6 +16,12 @@ RAG를 붙이든 에이전트를 붙이든 검색이 물어오는 것은 결국 
 
 셋 다 같은 백엔드 하나를 바라봅니다.
 
+| Confluence 확장 | 데스크톱 앱 |
+|---|---|
+| ![Confluence 페이지 위에 열린 검사 결과 패널](website/public/shots/extension-panel.png) | ![데스크톱 앱의 문서 검사 결과](website/public/shots/desktop-lint.png) |
+
+화면은 전부 실제 앱에서 찍은 것입니다. `pnpm shots`가 백엔드를 띄우고 확장과 데스크톱 앱을 실제로 돌려 만듭니다.
+
 ## 세 축으로 채점
 
 | 축 | 가중치 | 룰 | 무엇을 보나 |

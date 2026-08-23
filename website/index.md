@@ -40,6 +40,16 @@ features:
     details: Fastify 백엔드 + Postgres. docker compose 한 번으로 뜨고, 문서 원문은 저장하지 않습니다.
 ---
 
+## 실제 화면
+
+![Confluence 페이지 위에 열린 AI-Lint 패널. 등급 C, 총점 69점, 축별 점수와 지적 목록이 보인다](/shots/extension-panel.png)
+
+*Confluence 페이지 좌하단 버튼을 누르면 같은 페이지 위에 결과가 열립니다. AI 배지가 붙은 지적은 LLM 판정입니다.*
+
+![데스크톱 앱의 문서 검사 탭. PPTX, DOCX, XLSX, PDF 네 파일의 검사 결과와 선택한 문서의 지적 목록](/shots/desktop-lint.png)
+
+*데스크톱 앱은 폴더를 통째로 골라 오피스 문서와 PDF를 일괄 검사합니다.*
+
 ## 한눈에 보기
 
 ```

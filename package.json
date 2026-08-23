@@ -11,9 +11,11 @@
     "test:watch": "vitest",
     "typecheck": "turbo run typecheck",
     "build": "turbo run build",
-    "icons": "tsx scripts/build-icons.ts"
+    "icons": "tsx scripts/build-icons.ts",
+    "shots": "tsx scripts/build-shots.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^22.10.0",
     "tsx": "^4.19.0",
