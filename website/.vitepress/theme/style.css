@@ -1,0 +1,110 @@
+/* 로고(assets/logo.svg)의 파랑과 앰버를 사이트 전체 색으로 끌어온다. */
+:root {
+  --ai-blue: #3f7ac2;
+  --ai-blue-light: #5b9ae0;
+  --ai-blue-dark: #2a5da2;
+  --ai-amber: #f0a92b;
+
+  --vp-c-brand-1: #2f6cb5;
+  --vp-c-brand-2: var(--ai-blue);
+  --vp-c-brand-3: var(--ai-blue-light);
+  --vp-c-brand-soft: rgba(91, 154, 224, 0.14);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(110deg, var(--ai-blue-light) 10%, var(--ai-blue-dark) 55%, var(--ai-amber));
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, var(--ai-blue-light) 30%, var(--ai-amber));
+  --vp-home-hero-image-filter: blur(60px);
+
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-active-border: transparent;
+}
+
+.dark {
+  --vp-c-brand-1: #83b5ea;
+  --vp-c-brand-2: var(--ai-blue-light);
+  --vp-c-brand-3: var(--ai-blue);
+  --vp-c-brand-soft: rgba(91, 154, 224, 0.18);
+}
+
+/* 히어로 --------------------------------------------------------------- */
+
+.VPHero .image-src {
+  border-radius: 22%;
+  box-shadow: 0 26px 60px -20px rgba(15, 42, 79, 0.55);
+}
+
+/* 한국어는 단어 중간에서 끊기면 읽기 나쁘다. 어절 단위로만 줄바꿈한다. */
+.VPHero .text,
+.VPHero .tagline,
+.VPFeature .title,
+.VPFeature .details {
+  word-break: keep-all;
+}
+
+.VPHero .text {
+  line-height: 1.4;
+}
+
+.VPButton.brand {
+  background: linear-gradient(115deg, var(--ai-blue) 0%, var(--vp-c-brand-1) 100%);
+}
+
+.VPButton.brand:hover {
+  background: linear-gradient(115deg, var(--ai-blue-light) 0%, var(--ai-blue) 100%);
+}
+
+/* 기능 카드 ------------------------------------------------------------ */
+
+.VPFeature {
+  border-color: var(--vp-c-divider);
+  transition:
+    border-color 0.25s,
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-3);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -20px rgba(15, 42, 79, 0.6);
+}
+
+.VPFeature .icon {
+  background: var(--vp-c-brand-soft) !important;
+}
+
+.VPFeature .title {
+  line-height: 1.5;
+}
+
+/* 본문 ----------------------------------------------------------------- */
+
+.VPDoc h2 {
+  border-top-color: var(--vp-c-divider);
+}
+
+/* 아키텍처 다이어그램처럼 하이라이팅 없는 코드 블록. 브랜드 색 테두리를 준다. */
+.vp-doc div[class*='language-'] {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+}
+
+.vp-doc tr:nth-child(2n) {
+  background: var(--vp-c-bg-soft);
+}
+
+.vp-doc th {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-text-1);
+}
+
+/* 룰 ID(STR001 등)와 환경 변수 이름이 표에 빽빽하게 들어간다. 눈에 걸리게. */
+.vp-doc td code {
+  white-space: nowrap;
+}

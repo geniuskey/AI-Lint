@@ -21,16 +21,22 @@ hero:
 
 features:
   - title: 세 축으로 진단
+    icon: { src: /feature/axes.svg, width: '26', height: '26', wrap: true }
     details: 구조·청킹 친화성, 맥락 자립성, 메타데이터·최신성. 31개 룰이 문서를 100점 만점으로 채점하고 A~D 등급을 매깁니다.
   - title: 룰만으로는 못 잡는 것을 LLM이
+    icon: { src: /feature/ai.svg, width: '26', height: '26', wrap: true }
     details: '"지난번 논의대로" 같은 문서 밖 참조, 정의 없는 약어, 근거 없는 결정. 문맥을 읽어야 보이는 문제는 LLM이 판정하고, 근거 문장이 본문에 실제로 있는지 대조한 뒤에만 지적으로 남깁니다.'
   - title: Confluence는 브라우저에서
+    icon: { src: /feature/browser.svg, width: '26', height: '26', wrap: true }
     details: 페이지 좌하단 버튼 한 번이면 검사 결과가 뜹니다. 지적한 곳은 본문에서 바로 강조되고, 백엔드는 위키 자격 증명을 갖지 않습니다.
   - title: PPTX·DOCX·XLSX·PDF는 데스크톱에서
+    icon: { src: /feature/files.svg, width: '26', height: '26', wrap: true }
     details: 폴더를 통째로 골라 일괄 검사하고 HTML·Excel로 내보냅니다. Tauri 기반이라 설치 파일이 가볍습니다.
   - title: 문서 하나가 아니라 코퍼스 전체를
+    icon: { src: /feature/graph.svg, width: '26', height: '26', wrap: true }
     details: 검사한 문서에서 REQ-1, TC-3 같은 식별자를 모아 그래프를 만듭니다. 끊긴 참조, 테스트 없는 요구사항, 두 문서가 서로 다르게 적어둔 값을 찾아냅니다.
   - title: 사내에서 자급
+    icon: { src: /feature/server.svg, width: '26', height: '26', wrap: true }
     details: Fastify 백엔드 + Postgres. docker compose 한 번으로 뜨고, 문서 원문은 저장하지 않습니다.
 ---
 
