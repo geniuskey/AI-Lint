@@ -1,8 +1,8 @@
-import { createGeminiProvider } from '@ai-lint/llm'
 import { buildApp } from './app.js'
 import { loadConfig } from './config.js'
 import { createPool } from './db/client.js'
 import { migrate } from './db/migrate.js'
+import { createProvider } from './llm-provider.js'
 import { createPgQuota, createUnlimitedQuota } from './services/quota.js'
 import { createMemoryStore, createPgStore } from './services/report-store.js'
 import { createMemoryTraceIndex, createPgTraceIndex } from './services/trace-index.js'
@@ -28,11 +28,10 @@ const persistence = await (async () => {
   }
 })()
 
+const provider = createProvider(config)
+
 const app = buildApp({
-  provider: createGeminiProvider({
-    apiKey: config.GEMINI_API_KEY,
-    ...(config.GEMINI_MODEL ? { model: config.GEMINI_MODEL } : {}),
-  }),
+  provider,
   serviceToken: config.SERVICE_TOKEN,
   store: persistence.store,
   quota: persistence.quota,
@@ -40,6 +39,8 @@ const app = buildApp({
   limits: { maxBlocks: config.MAX_BLOCKS, llmMaxDocChars: config.LLM_MAX_DOC_CHARS },
   logLevel: config.LOG_LEVEL,
 })
+
+app.log.info(`LLM provider: ${provider.name}`)
 
 if (!config.DATABASE_URL) {
   app.log.warn('DATABASE_URL이 없어 리포트를 메모리에만 보관합니다. 재시작하면 사라집니다.')
