@@ -48,7 +48,11 @@ export function titleFrom(candidate: string | undefined, ctx: FileContext): stri
   return trimmed === '' ? fileNameOf(ctx.uri).replace(/\.[^.]+$/, '') : trimmed
 }
 
-/** 파일 기반 어댑터가 만드는 문서. 유형 분류는 백엔드가 맡으므로 unknown으로 둔다. */
+/**
+ * 파일 기반 어댑터가 만드는 문서.
+ * 파일에는 Confluence 라벨 같은 유형 힌트가 없다. origin을 llm으로 두어 백엔드가 분류하게 한다
+ * (template로 두면 "템플릿이 미분류라고 했다"는 뜻이 되어 유형별 규칙이 하나도 걸리지 않는다).
+ */
 export const makeDocument = (
   kind: SourceKind,
   ctx: FileContext,
@@ -63,7 +67,7 @@ export const makeDocument = (
     ...(ctx.author === undefined ? {} : { author: ctx.author }),
   },
   title,
-  docType: { value: 'unknown', confidence: 0, origin: 'template' },
+  docType: { value: 'unknown', confidence: 0, origin: 'llm' },
   blocks,
   links: [],
   metadata: { labels: [] },
