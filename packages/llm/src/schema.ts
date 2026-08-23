@@ -25,7 +25,7 @@ export const LlmResponseSchema = z.object({
 })
 export type LlmResponse = z.infer<typeof LlmResponseSchema>
 
-/** Gemini responseSchema. zod 버전과 같은 제약을 걸어 응답 단계와 검증 단계가 어긋나지 않게 한다. */
+/** 모델에 넘길 구조화 출력 스키마. zod 버전과 같은 제약을 걸어 응답 단계와 검증 단계가 어긋나지 않게 한다. */
 export const LLM_FINDING_SCHEMA: JsonSchema = {
   type: 'object',
   properties: {

@@ -25,9 +25,7 @@ const EnvSchema = z
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
     /** 확장·데스크톱 앱이 x-ai-lint-token으로 보내는 값. 짧으면 무차별 대입에 노출된다. */
     SERVICE_TOKEN: z.string().min(16),
-    LLM_PROVIDER: z.enum(['gemini', 'openai']).default('gemini'),
-    GEMINI_API_KEY: z.string().min(1).optional(),
-    GEMINI_MODEL: z.string().min(1).optional(),
+    LLM_PROVIDER: z.enum(['openai', 'gemini']).default('openai'),
     /** OpenAI 호환 엔드포인트. `/chat/completions` 앞부분까지. */
     LLM_BASE_URL: z.string().url().optional(),
     LLM_MODEL: z.string().min(1).optional(),
@@ -38,6 +36,8 @@ const EnvSchema = z
     LLM_HEADERS: HeaderMap.optional(),
     LLM_RESPONSE_FORMAT: z.enum(['json_schema', 'json_object']).default('json_schema'),
     LLM_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
+    GEMINI_API_KEY: z.string().min(1).optional(),
+    GEMINI_MODEL: z.string().min(1).optional(),
     DATABASE_URL: z.string().min(1).optional(),
     LLM_MAX_DOC_CHARS: z.coerce.number().int().positive().default(200_000),
     LLM_DAILY_LIMIT_PER_USER: z.coerce.number().int().nonnegative().default(200),
@@ -49,11 +49,10 @@ const EnvSchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: [path], message: `LLM_PROVIDER=${env.LLM_PROVIDER}일 때 필요합니다` })
     }
 
-    if (env.LLM_PROVIDER === 'gemini') require('GEMINI_API_KEY', env.GEMINI_API_KEY)
-    else {
+    if (env.LLM_PROVIDER === 'openai') {
       require('LLM_BASE_URL', env.LLM_BASE_URL)
       require('LLM_MODEL', env.LLM_MODEL)
-    }
+    } else require('GEMINI_API_KEY', env.GEMINI_API_KEY)
   })
 
 export type Config = z.infer<typeof EnvSchema>

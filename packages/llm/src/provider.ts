@@ -1,4 +1,4 @@
-/** Gemini의 responseSchema로 그대로 넘길 수 있는 JSON Schema 조각. */
+/** 구조화 출력 스키마. OpenAPI 방언인 `nullable`을 쓰므로, 표준을 요구하는 엔드포인트에는 프로바이더가 변환해 넘긴다. */
 export type JsonSchema = Record<string, unknown>
 
 export interface CompletionRequest {

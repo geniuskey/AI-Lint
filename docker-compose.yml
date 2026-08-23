@@ -22,9 +22,7 @@ services:
     environment:
       DATABASE_URL: postgres://ailint:${POSTGRES_PASSWORD:-ailint}@postgres:5432/ailint
       SERVICE_TOKEN: ${SERVICE_TOKEN:?SERVICE_TOKEN을 설정하세요}
-      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
       LLM_BASE_URL: ${LLM_BASE_URL:-}
       LLM_MODEL: ${LLM_MODEL:-}
       LLM_API_KEY: ${LLM_API_KEY:-}
@@ -33,6 +31,8 @@ services:
       LLM_HEADERS: ${LLM_HEADERS:-}
       LLM_RESPONSE_FORMAT: ${LLM_RESPONSE_FORMAT:-json_schema}
       LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-60000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       LLM_DAILY_LIMIT_PER_USER: ${LLM_DAILY_LIMIT_PER_USER:-200}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:

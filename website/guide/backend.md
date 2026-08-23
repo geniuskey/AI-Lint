@@ -20,20 +20,13 @@ Fastify 5 + Postgres 16. 확장과 데스크톱 앱이 공유하는 단 하나�
 | `HOST` | `0.0.0.0` | |
 | `LOG_LEVEL` | `info` | `fatal` \| `error` \| `warn` \| `info` \| `debug` \| `trace` |
 | `SERVICE_TOKEN` | **필수** | 클라이언트가 `x-ai-lint-token`으로 보내는 값. 16자 이상 |
-| `LLM_PROVIDER` | `gemini` | `gemini` \| `openai` |
+| `LLM_PROVIDER` | `openai` | `openai` \| `gemini` |
 | `DATABASE_URL` | 미지정 | 비우면 메모리 저장소 |
 | `LLM_MAX_DOC_CHARS` | `200000` | 넘으면 LLM을 건너뛰고 `llmSkipReason: 'too-large'` |
 | `LLM_DAILY_LIMIT_PER_USER` | `200` | 넘으면 `llmSkipReason: 'quota'` |
 | `MAX_BLOCKS` | `2000` | 넘으면 잘라서 검사하고 `truncated: true` |
 
-`LLM_PROVIDER=gemini`일 때:
-
-| 변수 | 기본값 | 설명 |
-|---|---|---|
-| `GEMINI_API_KEY` | **필수** | |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | |
-
-`LLM_PROVIDER=openai`일 때 — 자세한 것은 [사내 LLM 라우터 연결](#사내-llm-라우터-연결):
+`LLM_PROVIDER=openai`(기본)일 때 — 자세한 것은 [사내 LLM 라우터 연결](#사내-llm-라우터-연결):
 
 | 변수 | 기본값 | 설명 |
 |---|---|---|
@@ -46,11 +39,18 @@ Fastify 5 + Postgres 16. 확장과 데스크톱 앱이 공유하는 단 하나�
 | `LLM_RESPONSE_FORMAT` | `json_schema` | `json_schema` \| `json_object` |
 | `LLM_TIMEOUT_MS` | `60000` | |
 
+`LLM_PROVIDER=gemini`일 때:
+
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `GEMINI_API_KEY` | **필수** | |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | |
+
 설정이 틀리면 요청을 받기 전에 죽습니다. 반쯤 동작하는 서버보다 낫기 때문입니다. 빈 문자열은 없는 값으로 취급하므로, docker compose가 안 쓰는 변수를 빈 값으로 채워도 검증에 걸리지 않습니다.
 
 ## 사내 LLM 라우터 연결
 
-`LLM_PROVIDER=openai`는 OpenAI 호환 `POST /chat/completions` 엔드포인트에 붙습니다. 사내 라우터를 앞에 둔 환경을 위한 것이라, 인증과 헤더를 자유롭게 바꿀 수 있습니다.
+기본 프로바이더는 OpenAI 호환 `POST /chat/completions` 엔드포인트에 붙습니다. 사내 라우터를 앞에 둔 환경을 전제로 하기 때문에, 인증과 헤더를 자유롭게 바꿀 수 있습니다.
 
 **토큰을 커스텀 헤더로 보내기.** 사내 라우터는 `Authorization` 대신 자체 헤더를 쓰는 경우가 많습니다.
 
@@ -74,7 +74,6 @@ LLM_HEADERS='{"x-dept-code":"AI-PLATFORM","x-request-source":"ai-lint","x-api-ve
 스키마의 `nullable: true`는 표준 JSON Schema의 union 타입(`["object","null"]`)으로 바꿔서 보냅니다. Gemini 방언을 그대로 던지면 거부하는 라우터가 있습니다.
 
 ```bash
-LLM_PROVIDER=openai \
 LLM_BASE_URL=https://llm.mycorp.com/v1 \
 LLM_MODEL=internal-gpt-4o \
 LLM_API_KEY=... \
@@ -85,6 +84,19 @@ pnpm --filter @ai-lint/backend dev
 ```
 
 부팅 로그의 `LLM provider: openai:internal-gpt-4o`로 어느 쪽이 붙었는지 확인합니다. 토큰과 헤더 값은 로그에 남지 않습니다.
+
+## Gemini로 붙이기
+
+사내 라우터가 없는 환경 — 개인 검증이나 데모 — 에서는 `LLM_PROVIDER=gemini`로 Google API에 직접 붙습니다.
+
+```bash
+LLM_PROVIDER=gemini \
+GEMINI_API_KEY=... \
+SERVICE_TOKEN=... \
+pnpm --filter @ai-lint/backend dev
+```
+
+프롬프트와 근거 대조는 프로바이더와 무관하게 같습니다. 룰 판정 품질만 모델에 따라 달라집니다.
 
 ## 인증
 
@@ -140,22 +152,19 @@ docker build -f apps/backend/Dockerfile -t ai-lint-backend .
 
 이미지는 node:22-alpine 멀티스테이지이고, `USER node`로 떨어지며, `HEALTHCHECK`가 `/v1/health`를 두드립니다.
 
-`docker-compose.yml`은 Postgres까지 함께 띄웁니다.
-
-```bash
-SERVICE_TOKEN=... GEMINI_API_KEY=... docker compose up -d
-```
-
-사내 라우터를 쓴다면 `.env`에 모아두는 편이 낫습니다.
+`docker-compose.yml`은 Postgres까지 함께 띄웁니다. 변수는 `.env`에 모아두는 편이 낫습니다.
 
 ```bash
 SERVICE_TOKEN=...
-LLM_PROVIDER=openai
 LLM_BASE_URL=https://llm.mycorp.com/v1
 LLM_MODEL=internal-gpt-4o
 LLM_API_KEY=...
 LLM_AUTH_HEADER=x-llm-token
 LLM_HEADERS={"x-dept-code":"AI-PLATFORM"}
+```
+
+```bash
+docker compose up -d
 ```
 
 ## 운영 시 볼 것

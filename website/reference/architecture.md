@@ -9,7 +9,7 @@ packages/
   ir                  문서 중간 표현. 스키마, 앵커, 해시, 순회
   xml                 XML 파서 (어댑터 공용)
   rules               룰 카탈로그, 실행기, 채점, 규칙셋
-  llm                 LLM 프로바이더(Gemini / OpenAI 호환), 프롬프트, 근거 대조
+  llm                 LLM 프로바이더(OpenAI 호환 / Gemini), 프롬프트, 근거 대조
   trace               식별자 추출, 그래프, TRC 룰, 상충 탐지
   contract            요청·응답 타입과 Zod 스키마
   backend-client      확장·데스크톱이 공유하는 HTTP 클라이언트
@@ -145,6 +145,6 @@ pnpm --filter @ai-lint/extension test:e2e    # Playwright
 | Tauri v2 | 데스크톱 | 설치 파일 크기. 사이드카가 필요 없어 Electron의 이점이 상쇄됨 |
 | fflate | OOXML | 순수 JS. PPTX/DOCX/XLSX 압축 해제와 Excel 생성에 모두 씀 |
 | pdfjs-dist | PDF | 텍스트 레이어와 위치를 함께 얻을 수 있음 |
-| @google/genai | LLM | 구조화 출력 스키마 지원 (`google-generativeai`는 폐지됨) |
-| fetch | LLM | OpenAI 호환 프로바이더는 SDK 없이 직접 호출. 인증 헤더 이름과 필수 헤더를 자유롭게 바꿔야 해서 |
+| fetch | LLM | 기본 프로바이더는 SDK 없이 직접 호출. 사내 라우터마다 인증 헤더 이름과 필수 헤더가 달라 SDK로는 표현되지 않음 |
+| @google/genai | LLM | Gemini 옵션용. 구조화 출력 스키마 지원 (`google-generativeai`는 폐지됨) |
 | VitePress | 문서 | 이 사이트 |
