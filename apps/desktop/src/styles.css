@@ -1,45 +1,453 @@
-:root { font-family: 'Malgun Gothic', system-ui, sans-serif; font-size: 14px; color: #1a1a1a; }
-body { margin: 0; background: #f6f7f9; }
-.app { max-width: 1000px; margin: 0 auto; padding: 24px; }
-.app > h1 { display: flex; align-items: center; gap: 10px; }
-.settings { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin-bottom: 16px; }
-.settings label { display: grid; gap: 4px; }
-input, select { padding: 6px 8px; border: 1px solid #c7cbd1; border-radius: 4px; font: inherit; }
-.actions { display: flex; gap: 8px; margin-bottom: 16px; }
-button { padding: 6px 14px; border: 1px solid #c7cbd1; border-radius: 4px; background: #fff; font: inherit; cursor: pointer; }
-button:hover { background: #eef1f5; }
-.inline { display: flex; align-items: center; gap: 4px; }
-.error { color: #b3261e; }
-.split { display: grid; grid-template-columns: minmax(320px, 2fr) 3fr; gap: 16px; align-items: start; }
-table.jobs { width: 100%; border-collapse: collapse; background: #fff; }
-table.jobs th, table.jobs td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e3e6ea; }
-table.jobs th { font-weight: 600; color: #5a6270; }
-table.jobs tbody tr { cursor: pointer; }
-table.jobs tbody tr:hover { background: #f0f3f7; }
-table.jobs tr.selected { background: #e4ecf9; }
-.muted { color: #6b7280; }
-.counts { display: flex; gap: 8px; }
-.report { background: #fff; padding: 16px; border: 1px solid #e3e6ea; border-radius: 6px; }
-.score { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.grade { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; color: #fff; font-weight: 700; }
-.grade-A { background: #1f7a3f; } .grade-B { background: #3f7ac2; }
-.grade-C { background: #c98a1a; } .grade-D { background: #b3261e; }
-.axes { display: flex; gap: 16px; list-style: none; padding: 0; margin: 0 0 12px; }
-.note { background: #fdf6e3; border: 1px solid #e8d9a8; border-radius: 4px; padding: 8px; }
-.findings { list-style: none; padding: 0; display: grid; gap: 12px; }
-.finding { border-top: 1px solid #e3e6ea; padding-top: 12px; }
-.finding-head { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; flex-wrap: wrap; }
-.finding-message { margin: 0 0 4px; font-weight: 600; }
-.badge { padding: 1px 6px; border-radius: 3px; color: #fff; font-size: 12px; }
-.badge.llm { background: #6b4fbb; }
-.sev-error { color: #b3261e; } .badge.sev-error { background: #b3261e; color: #fff; }
-.sev-warning { color: #c98a1a; } .badge.sev-warning { background: #c98a1a; color: #fff; }
-.sev-info { color: #3f7ac2; } .badge.sev-info { background: #3f7ac2; color: #fff; }
-.evidence, .suggestion pre { background: #f6f7f9; padding: 8px; border-radius: 4px; white-space: pre-wrap; margin: 4px 0; }
-.suggestion .before { border-left: 3px solid #b3261e; }
-.suggestion .after { border-left: 3px solid #1f7a3f; }
-.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
-.tabs button.active { background: #e4ecf9; border-color: #3f7ac2; font-weight: 600; }
-table.trace { width: 100%; border-collapse: collapse; }
-table.trace th, table.trace td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e3e6ea; vertical-align: top; }
-table.trace th { font-weight: 600; color: #5a6270; }
+/* 색은 assets/logo.svg에서 가져왔다. 확장 패널·문서 사이트와 같은 계열이다. */
+:root {
+  --blue: #3f7ac2;
+  --blue-dark: #2a5da2;
+  --blue-light: #5b9ae0;
+  --amber: #d9880f;
+
+  --bg: #f2f5f9;
+  --surface: #fff;
+  --line: #dfe5ee;
+  --text: #16202e;
+  --muted: #66738a;
+
+  --ok: #1f7a3f;
+  --warn: #c98a1a;
+  --bad: #b3261e;
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(16, 32, 56, 0.05), 0 8px 24px -18px rgba(16, 32, 56, 0.4);
+
+  font-family: 'Malgun Gothic', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+/* 상단 바 --------------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 52px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  align-self: stretch;
+}
+
+.tabs button {
+  padding: 0 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  color: var(--text);
+  background: none;
+}
+
+.tabs button.active {
+  border-bottom-color: var(--blue);
+  color: var(--blue-dark);
+}
+
+/* 본문 ------------------------------------------------------------------ */
+
+.app {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.settings {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.settings label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+input,
+select {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(91, 154, 224, 0.22);
+}
+
+button {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+button:hover:not(:disabled) {
+  border-color: #c3cddc;
+  background: #f7f9fc;
+}
+
+button:disabled {
+  color: #a3adbd;
+  cursor: default;
+}
+
+button.primary {
+  border-color: transparent;
+  background: linear-gradient(115deg, var(--blue-light), var(--blue-dark));
+  color: #fff;
+}
+
+button.primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: linear-gradient(115deg, var(--blue), var(--blue-dark));
+}
+
+button.primary:disabled {
+  background: #c6d2e2;
+  color: #fff;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.inline input {
+  accent-color: var(--blue);
+}
+
+.error {
+  color: var(--bad);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(320px, 2fr) 3fr;
+  gap: 14px;
+  align-items: start;
+}
+
+/* 파일 목록 ------------------------------------------------------------- */
+
+table.jobs {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+table.jobs th,
+table.jobs td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+table.jobs th {
+  background: #eef2f8;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+table.jobs tbody tr {
+  cursor: pointer;
+}
+
+table.jobs tbody tr:hover {
+  background: #f4f7fb;
+}
+
+table.jobs tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.jobs tr.selected {
+  background: #e8f0fb;
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+
+table.jobs td:first-child {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counts {
+  display: flex;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 리포트 ---------------------------------------------------------------- */
+
+.report {
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.score strong {
+  font-size: 20px;
+}
+
+.grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.grade-A {
+  background: linear-gradient(140deg, #2ea25b, var(--ok));
+}
+.grade-B {
+  background: linear-gradient(140deg, var(--blue-light), var(--blue-dark));
+}
+.grade-C {
+  background: linear-gradient(140deg, #e0a63a, var(--warn));
+}
+.grade-D {
+  background: linear-gradient(140deg, #d1453c, var(--bad));
+}
+
+.axes {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+}
+
+.axes li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.axes strong {
+  color: var(--text);
+}
+
+.note {
+  padding: 9px 12px;
+  border-left: 3px solid var(--amber);
+  border-radius: 0 7px 7px 0;
+  background: #fdf6e6;
+  color: #7a5410;
+}
+
+.findings {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.finding {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-radius: 8px;
+}
+
+.finding[data-severity='error'] {
+  border-left-color: var(--bad);
+}
+.finding[data-severity='warning'] {
+  border-left-color: var(--warn);
+}
+.finding[data-severity='info'] {
+  border-left-color: var(--blue);
+}
+
+.finding-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.finding-message {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge.llm {
+  background: #6b4fbb;
+}
+
+.sev-error {
+  color: var(--bad);
+}
+.sev-warning {
+  color: var(--warn);
+}
+.sev-info {
+  color: var(--blue);
+}
+.badge.sev-error {
+  background: var(--bad);
+  color: #fff;
+}
+.badge.sev-warning {
+  background: var(--warn);
+  color: #fff;
+}
+.badge.sev-info {
+  background: var(--blue);
+  color: #fff;
+}
+
+.evidence,
+.suggestion pre {
+  margin: 6px 0;
+  padding: 9px 11px;
+  border-radius: 7px;
+  background: #f4f7fb;
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.suggestion .before {
+  border-left: 3px solid var(--bad);
+  background: #fdf0ef;
+}
+
+.suggestion .after {
+  border-left: 3px solid var(--ok);
+  background: #eef8f1;
+}
+
+/* 추적성 ---------------------------------------------------------------- */
+
+table.trace {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.trace th,
+table.trace td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+table.trace th {
+  background: #eef2f8;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+table.trace tbody tr:nth-child(2n) {
+  background: #f8fafd;
+}

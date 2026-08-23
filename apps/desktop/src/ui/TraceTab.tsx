@@ -49,8 +49,8 @@ export function TraceTab({ settings, token }: TraceTabProps): JSX.Element {
 
   return (
     <>
-      <section className="actions">
-        <button type="button" onClick={() => void onRun()} disabled={running}>코퍼스 조회</button>
+      <section className="card actions">
+        <button type="button" className="primary" onClick={() => void onRun()} disabled={running}>코퍼스 조회</button>
         <label className="inline">
           <input type="checkbox" checked={useLlm} onChange={(e) => setUseLlm(e.target.checked)} disabled={running} />
           AI 대조 사용

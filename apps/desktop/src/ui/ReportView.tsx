@@ -7,7 +7,7 @@ import type { JobState } from '../core/lint-file.js'
 
 function FindingCard({ finding }: { finding: Finding }): JSX.Element {
   return (
-    <li className="finding">
+    <li className="finding" data-severity={finding.severity}>
       <div className="finding-head">
         <span className={`badge sev-${finding.severity}`}>{SEVERITY_LABELS[finding.severity]}</span>
         <span className="muted">{finding.ruleId}</span>
