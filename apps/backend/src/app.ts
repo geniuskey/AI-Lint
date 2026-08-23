@@ -1,5 +1,6 @@
 import { LlmError, PROMPT_VERSION, type LlmProvider } from '@ai-lint/llm'
 import { defaultRegistry, type RuleRegistry } from '@ai-lint/rules'
+import { DEFAULT_TRACE_CONFIG, type TraceConfig } from '@ai-lint/trace'
 import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { ZodError } from 'zod'
 import { createAuthHook } from './auth.js'
@@ -9,10 +10,13 @@ import { healthRoutes } from './routes/health.js'
 import { lintRoutes } from './routes/lint.js'
 import { reportsRoutes } from './routes/reports.js'
 import { rulesRoutes } from './routes/rules.js'
+import { traceRoutes } from './routes/trace.js'
 import { DEFAULT_LIMITS, type Limits, type LintDeps } from './services/lint-service.js'
 import { createUnlimitedQuota, type QuotaService } from './services/quota.js'
 import { createMemoryStore, type ReportStore } from './services/report-store.js'
 import { createMemoryRulesetSource, type RulesetSource } from './services/ruleset-source.js'
+import { createMemoryTraceIndex, type TraceIndexStore } from './services/trace-index.js'
+import type { TraceDeps } from './services/trace-service.js'
 
 export interface AppDeps {
   provider: LlmProvider
@@ -22,6 +26,8 @@ export interface AppDeps {
   rulesets?: RulesetSource
   registry?: RuleRegistry
   limits?: Partial<Limits>
+  traceIndex?: TraceIndexStore
+  traceConfig?: Partial<TraceConfig>
   promptVersion?: number
   now?: () => Date
   logLevel?: string
@@ -73,13 +79,22 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     now: deps.now ?? (() => new Date()),
   }
 
+  const traceDeps: TraceDeps = {
+    provider: deps.provider,
+    index: deps.traceIndex ?? createMemoryTraceIndex(),
+    quota: lintDeps.quota,
+    config: { ...DEFAULT_TRACE_CONFIG, ...deps.traceConfig },
+    now: lintDeps.now,
+  }
+
   app.decorateRequest('userId', 'anonymous')
   app.addHook('onRequest', createAuthHook(deps.serviceToken))
   app.setErrorHandler(errorHandler)
 
   app.register(healthRoutes)
   app.register(rulesRoutes(lintDeps.rulesets))
-  app.register(lintRoutes(lintDeps))
+  app.register(lintRoutes(lintDeps, { index: traceDeps.index, config: traceDeps.config }))
+  app.register(traceRoutes(traceDeps))
   app.register(reportsRoutes(lintDeps.store))
   app.register(doctypeRoutes(lintDeps.store))
 
