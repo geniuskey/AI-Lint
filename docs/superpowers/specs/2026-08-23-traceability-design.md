@@ -114,7 +114,8 @@ export interface DocIndexEntry {
   linksTo: string[]
 }
 
-export function toIndexEntry(doc: Document, config: TraceConfig): DocIndexEntry
+/** 해시는 lint 리포트가 이미 계산해 두었다. 다시 재지 않는다. */
+export function toIndexEntry(doc: Document, documentHash: string, config: TraceConfig): DocIndexEntry
 
 export interface TraceGraph {
   entries: DocIndexEntry[]
@@ -272,10 +273,13 @@ CREATE TABLE doc_index (
 ```typescript
 export interface TraceIndexStore {
   upsert(entry: DocIndexEntry): Promise<void>
+  /** 최근 갱신 순으로 상한(5000건)까지 */
   all(): Promise<DocIndexEntry[]>
   count(): Promise<number>
 }
 ```
+
+`all()`은 그래프를 메모리에 통째로 올린다. 상한을 두지 않으면 코퍼스가 커진 뒤 이 라우트 하나가 서버를 넘어뜨린다. `count()`가 상한보다 크면 리포트에 그대로 실려 사용자가 부분 조회임을 안다.
 
 **적재는 라우트에서 한다.** `lintDocument`를 건드리지 않는다 — 검사와 색인은 별개 관심사이고, 라우트에는 `request.log`가 있어 실패를 남길 곳이 있다.
 
