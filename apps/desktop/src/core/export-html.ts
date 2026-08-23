@@ -19,6 +19,8 @@ th { background: #f0f3f7; }
 .where { color: #6b7280; }
 .error { color: #b3261e; } .warning { color: #c98a1a; } .info { color: #3f7ac2; }
 pre { background: #f6f7f9; padding: 8px; white-space: pre-wrap; }
+.muted { color: #6b7280; }
+table.trace td { vertical-align: top; }
 `
 
 function summaryRow(job: JobState): string {
@@ -57,14 +59,20 @@ function detailHtml(job: JobState): string {
 ${sortFindings(report.findings).map(findingHtml).join('\n')}`
 }
 
-export function toHtml(jobs: readonly JobState[], generatedAt: string): string {
-  return `<!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>AI Lint 검사 결과</title>
+export const htmlPage = (title: string, body: string): string =>
+  `<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
 <style>${STYLE}</style></head><body>
-<h1>AI Lint 검사 결과</h1>
+${body}
+</body></html>`
+
+export function toHtml(jobs: readonly JobState[], generatedAt: string): string {
+  return htmlPage(
+    'AI Lint 검사 결과',
+    `<h1>AI Lint 검사 결과</h1>
 <p>${escapeHtml(generatedAt)} · 파일 ${jobs.length}개</p>
 <table><thead><tr><th>파일</th><th>점수</th><th>등급</th><th>오류</th><th>경고</th><th>정보</th></tr></thead>
 <tbody>${jobs.map(summaryRow).join('')}</tbody></table>
-${jobs.map(detailHtml).join('\n')}
-</body></html>`
+${jobs.map(detailHtml).join('\n')}`,
+  )
 }
