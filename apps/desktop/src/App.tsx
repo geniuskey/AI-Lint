@@ -13,6 +13,7 @@ import {
 } from './platform/tauri.js'
 import { JobTable } from './ui/JobTable.js'
 import { ReportView } from './ui/ReportView.js'
+import { TraceTab } from './ui/TraceTab.js'
 
 function fileOfPath(path: string): DocumentFile | null {
   const name = path.split(/[\\/]/).pop() ?? path
@@ -30,6 +31,7 @@ export function App(): JSX.Element {
   const [running, setRunning] = useState(false)
   const [useLlm, setUseLlm] = useState(true)
   const [selected, setSelected] = useState(0)
+  const [tab, setTab] = useState<'lint' | 'trace'>('lint')
   const cancelRef = useRef(false)
 
   useEffect(() => {
@@ -95,6 +97,15 @@ export function App(): JSX.Element {
     <main className="app">
       <h1>AI Lint</h1>
 
+      <nav className="tabs">
+        <button type="button" className={tab === 'lint' ? 'active' : ''} onClick={() => setTab('lint')}>
+          문서 검사
+        </button>
+        <button type="button" className={tab === 'trace' ? 'active' : ''} onClick={() => setTab('trace')}>
+          추적성
+        </button>
+      </nav>
+
       <section className="settings">
         <label>
           백엔드 주소
@@ -116,31 +127,37 @@ export function App(): JSX.Element {
         </label>
       </section>
 
-      <section className="actions">
-        <button type="button" onClick={() => void onPickFiles()} disabled={running}>파일 선택</button>
-        <button type="button" onClick={() => void onPickFolder()} disabled={running}>폴더 선택</button>
-        <label className="inline">
-          <input type="checkbox" checked={useLlm} onChange={(e) => setUseLlm(e.target.checked)} disabled={running} />
-          AI 검사 사용
-        </label>
-        <button type="button" onClick={() => void onRun()} disabled={running || files.length === 0}>
-          검사 시작
-        </button>
-        {running ? (
-          <button type="button" onClick={() => { cancelRef.current = true }}>취소</button>
-        ) : null}
-        <button type="button" onClick={() => void onExportHtml()} disabled={running || jobs.length === 0}>
-          HTML 저장
-        </button>
-        <button type="button" onClick={() => void onExportXlsx()} disabled={running || jobs.length === 0}>
-          Excel 저장
-        </button>
-      </section>
+      {tab === 'trace' ? (
+        <TraceTab settings={settings} token={token} />
+      ) : (
+        <>
+          <section className="actions">
+            <button type="button" onClick={() => void onPickFiles()} disabled={running}>파일 선택</button>
+            <button type="button" onClick={() => void onPickFolder()} disabled={running}>폴더 선택</button>
+            <label className="inline">
+              <input type="checkbox" checked={useLlm} onChange={(e) => setUseLlm(e.target.checked)} disabled={running} />
+              AI 검사 사용
+            </label>
+            <button type="button" onClick={() => void onRun()} disabled={running || files.length === 0}>
+              검사 시작
+            </button>
+            {running ? (
+              <button type="button" onClick={() => { cancelRef.current = true }}>취소</button>
+            ) : null}
+            <button type="button" onClick={() => void onExportHtml()} disabled={running || jobs.length === 0}>
+              HTML 저장
+            </button>
+            <button type="button" onClick={() => void onExportXlsx()} disabled={running || jobs.length === 0}>
+              Excel 저장
+            </button>
+          </section>
 
-      <section className="split">
-        <JobTable jobs={jobs} selected={selected} onSelect={setSelected} />
-        <ReportView job={jobs[selected]} />
-      </section>
+          <section className="split">
+            <JobTable jobs={jobs} selected={selected} onSelect={setSelected} />
+            <ReportView job={jobs[selected]} />
+          </section>
+        </>
+      )}
     </main>
   )
 }

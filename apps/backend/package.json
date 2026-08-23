@@ -14,6 +14,7 @@
     "@ai-lint/ir": "workspace:*",
     "@ai-lint/llm": "workspace:*",
     "@ai-lint/rules": "workspace:*",
+    "@ai-lint/trace": "workspace:*",
     "fastify": "^5.2.0",
     "pg": "^8.13.0",
     "zod": "^3.24.0"

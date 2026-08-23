@@ -1,4 +1,4 @@
-import type { LintOptions, LintReport } from '@ai-lint/contract'
+import type { LintOptions, LintReport, TraceReport, TraceRequest } from '@ai-lint/contract'
 import type { DocType, Document } from '@ai-lint/ir'
 import { BACKEND_ERROR_MESSAGES, BackendError, kindOfStatus } from './errors.js'
 
@@ -71,6 +71,15 @@ export async function requestLint(
     fetchImpl,
   )
   return (await response.json()) as LintReport
+}
+
+export async function requestTrace(
+  options: Partial<TraceRequest>,
+  settings: BackendSettings,
+  fetchImpl: typeof fetch = fetch,
+): Promise<TraceReport> {
+  const response = await post('/v1/trace/analyze', options, settings, fetchImpl)
+  return (await response.json()) as TraceReport
 }
 
 export async function saveDocTypeOverride(

@@ -38,6 +38,9 @@ importers:
       '@ai-lint/rules':
         specifier: workspace:*
         version: link:../../packages/rules
+      '@ai-lint/trace':
+        specifier: workspace:*
+        version: link:../../packages/trace
       fastify:
         specifier: ^5.2.0
         version: 5.12.1
@@ -238,6 +241,24 @@ importers:
       yaml:
         specifier: ^2.6.0
         version: 2.9.0
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+
+  packages/trace:
+    dependencies:
+      '@ai-lint/contract':
+        specifier: workspace:*
+        version: link:../contract
+      '@ai-lint/ir':
+        specifier: workspace:*
+        version: link:../ir
+      '@ai-lint/llm':
+        specifier: workspace:*
+        version: link:../llm
+      '@ai-lint/rules':
+        specifier: workspace:*
+        version: link:../rules
       zod:
         specifier: ^3.24.0
         version: 3.25.76

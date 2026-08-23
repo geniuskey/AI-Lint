@@ -37,3 +37,8 @@ table.jobs tr.selected { background: #e4ecf9; }
 .evidence, .suggestion pre { background: #f6f7f9; padding: 8px; border-radius: 4px; white-space: pre-wrap; margin: 4px 0; }
 .suggestion .before { border-left: 3px solid #b3261e; }
 .suggestion .after { border-left: 3px solid #1f7a3f; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tabs button.active { background: #e4ecf9; border-color: #3f7ac2; font-weight: 600; }
+table.trace { width: 100%; border-collapse: collapse; }
+table.trace th, table.trace td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e3e6ea; vertical-align: top; }
+table.trace th { font-weight: 600; color: #5a6270; }
