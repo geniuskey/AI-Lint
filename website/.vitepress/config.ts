@@ -16,7 +16,10 @@ export default defineConfig({
     ['link', { rel: 'apple-touch-icon', href: '/AI-Lint/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#3f7ac2' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'AI-Lint' }],
+    ['meta', { name: 'author', content: 'Euiyun Lab' }],
+    ['meta', { property: 'og:site_name', content: 'AI-Lint' }],
+    ['meta', { property: 'og:url', content: 'https://geniuskey.github.io/AI-Lint/' }],
+    ['meta', { property: 'og:title', content: 'AI-Lint — 문서가 AI에게 읽히는지 검사합니다' }],
     [
       'meta',
       {
@@ -104,7 +107,7 @@ export default defineConfig({
 
     footer: {
       message: '사내 배포용 도구입니다.',
-      copyright: 'AI-Lint',
+      copyright: 'AI-Lint · by <a href="https://euiyun.com">Euiyun Lab</a>',
     },
   },
 })

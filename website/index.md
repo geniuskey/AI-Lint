@@ -1,5 +1,7 @@
 ---
 layout: home
+title: AI-Lint — 문서가 AI에게 읽히는지 검사합니다
+titleTemplate: false
 
 hero:
   name: AI-Lint
